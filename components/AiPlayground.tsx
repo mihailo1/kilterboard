@@ -2,9 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { generateBoulder, loadBoulderAi } from '@/lib/ai/boulder-ai'
-import { applyPaintWithRules } from '@/lib/set-rules'
-import { difficultyToGrade } from '@/lib/grades'
+import { BluetoothSet } from '@/components/BluetoothSet'
 import {
   PaintBoard,
   holdsEqual,
@@ -12,9 +10,17 @@ import {
   mapToHolds,
   type PaintTool,
 } from '@/components/PaintBoard'
+import { generateBoulder, loadBoulderAi } from '@/lib/ai/boulder-ai'
+import {
+  holdsFromRoleMap,
+  holdsToLedPlacements,
+} from '@/lib/aurora/board'
+import { isBoardConnected, setLeds } from '@/lib/aurora/device'
+import { difficultyToGrade } from '@/lib/grades'
+import { applyPaintWithRules } from '@/lib/set-rules'
 
 /**
- * Hold-AR playground: generate + optional paint edit.
+ * Hold-AR playground: generate + paint + light on board.
  * Feedback / Approve-tags removed (was for remix retrain loop).
  */
 export function AiPlayground() {
@@ -30,6 +36,7 @@ export function AiPlayground() {
   )
   const [paintTool, setPaintTool] = useState<PaintTool>(13)
   const [ruleMsg, setRuleMsg] = useState<string | null>(null)
+  const [pushBle, setPushBle] = useState(true)
 
   useEffect(() => {
     void loadBoulderAi()
@@ -54,10 +61,21 @@ export function AiPlayground() {
     () => (originalMap ? mapToHolds(originalMap) : []),
     [originalMap],
   )
+  const holds = useMemo(
+    () => (roleMap ? holdsFromRoleMap(roleMap) : []),
+    [roleMap],
+  )
   const isEdited =
     !!roleMap &&
     !!originalMap &&
     !holdsEqual(currentHoldsList, originalHoldsList)
+
+  // Auto-push LEDs when holds change (if already connected)
+  useEffect(() => {
+    if (!pushBle || !isBoardConnected()) return
+    if (holds.length === 0) return
+    void setLeds(holdsToLedPlacements(holds)).catch(() => {})
+  }, [holds, pushBle])
 
   const paintHold = (placementId: number) => {
     if (!roleMap) return
@@ -138,6 +156,27 @@ export function AiPlayground() {
       </header>
 
       <div className="mt-6 flex flex-col gap-4">
+        <section className="ui-card w-full space-y-3 p-4 sm:p-5">
+          <h2 className="ui-label !flex-row">Light on board</h2>
+          <BluetoothSet
+            holds={holds}
+            climbName={
+              lastSeed != null
+                ? `Hold AR · seed ${lastSeed}`
+                : 'Hold AR playground'
+            }
+          />
+          <label className="flex cursor-pointer items-center gap-2 text-xs text-muted">
+            <input
+              type="checkbox"
+              checked={pushBle}
+              onChange={(e) => setPushBle(e.target.checked)}
+              className="rounded border-border bg-surface-2 text-accent focus:ring-accent/40"
+            />
+            Auto-update LEDs when holds change (if connected)
+          </label>
+        </section>
+
         <section className="ui-card w-full space-y-3 p-3 sm:p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="ui-label !flex-row">Board</p>

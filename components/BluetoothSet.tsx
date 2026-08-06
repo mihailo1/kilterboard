@@ -105,7 +105,7 @@ export function BluetoothSet({ holds, climbName }: BluetoothSetProps) {
         <button
           type="button"
           onClick={handleSet}
-          disabled={busy || holds.length === 0}
+          disabled={busy}
           className="ui-btn-primary"
         >
           <BluetoothIcon />
@@ -114,8 +114,12 @@ export function BluetoothSet({ holds, climbName }: BluetoothSetProps) {
               ? 'Connecting…'
               : 'Setting…'
             : connected
-              ? `Set${climbName ? ` “${climbName}”` : ''}`
-              : 'Connect & Set'}
+              ? holds.length === 0
+                ? 'Clear board'
+                : `Set${climbName ? ` “${climbName}”` : ''}`
+              : holds.length === 0
+                ? 'Connect'
+                : 'Connect & Set'}
         </button>
 
         {connected && (
