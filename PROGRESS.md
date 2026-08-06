@@ -15,6 +15,12 @@
 
 ---
 
+## 2026-08-06 — Prod 503 /api/climbs (Vercel)
+
+- **Cause:** `data/boardsesh/*.db` gitignored → no catalog on deploy → API returned 503
+- **Fix:** slim DB (~120MB) + `.gz` (~37MB) from `sync-boardsesh.mjs`; `ensure-boardsesh-db.mjs` on `npm run build` (Vercel); runtime gunzip to `/tmp`; `outputFileTracingIncludes` for API routes
+- Optional `BOARDSESH_DB_URL` for hosted db/gz
+
 ## 2026-08-06 — v1.1.0 PWA polish
 
 - Floating glass **dock** (Climbs / Set / Hold AR) + safe-area insets

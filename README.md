@@ -54,11 +54,19 @@ Open [http://localhost:3000](http://localhost:3000).
 Climbs come from [Boardsesh board snapshots](https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/manifest.json) (Kilter Original layout), filtered to **product size 10**.
 
 ```bash
-npm run sync:climbs              # refresh subset DB
+npm run sync:climbs              # slim SQLite + .gz (~120MB / ~37MB)
 npm run sync:climbs -- --keep-full
 ```
 
-`data/boardsesh/*.db` is gitignored — re-run sync after clone.
+`data/boardsesh/*.db` is **gitignored** (too large for the repo). After clone, run `sync:climbs` once for local dev.
+
+#### Vercel / production
+
+`/api/climbs` returns **503** if the DB is missing. On Vercel, `npm run build` runs `ensure-boardsesh-db.mjs`, which downloads Boardsesh and builds the slim DB + gzip during the deploy. The function gunzips into `/tmp` on cold start.
+
+Optional override: set `BOARDSESH_DB_URL` to a public `.db` or `.db.gz` URL if you host the file yourself.
+
+Requires **Node ≥ 22** (`node:sqlite`).
 
 ## Hold AR (local AI)
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import {
   boardseshDbExists,
+  ensureBoardseshDb,
   getBoardseshMeta,
   searchClimbs,
   type ClimbKindFilter,
@@ -8,6 +9,8 @@ import {
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+/** Cold start may gunzip ~120MB DB into /tmp */
+export const maxDuration = 60
 
 function num(sp: URLSearchParams, key: string): number | undefined {
   const raw = sp.get(key)
@@ -17,12 +20,20 @@ function num(sp: URLSearchParams, key: string): number | undefined {
 }
 
 export async function GET(request: NextRequest) {
-  if (!boardseshDbExists()) {
+  try {
+    await ensureBoardseshDb()
+  } catch (err) {
+    const message =
+      err instanceof Error
+        ? err.message
+        : 'Boardsesh database not found. Run: npm run sync:climbs'
     return NextResponse.json(
       {
-        error:
-          'Boardsesh database not found. Run: node scripts/sync-boardsesh.mjs',
+        error: message,
         meta: null,
+        hint: boardseshDbExists()
+          ? 'DB path found but failed to open — check logs'
+          : 'DB not in deploy bundle. Vercel build must run ensure-boardsesh-db.mjs',
       },
       { status: 503 },
     )

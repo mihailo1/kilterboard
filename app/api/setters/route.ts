@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { boardseshDbExists, searchSetters } from '@/lib/boardsesh'
+import { ensureBoardseshDb, searchSetters } from '@/lib/boardsesh'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+export const maxDuration = 60
 
 /** GET /api/setters?q=miha — autocomplete climb authors from local Boardsesh DB */
 export async function GET(request: NextRequest) {
-  if (!boardseshDbExists()) {
+  try {
+    await ensureBoardseshDb()
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : 'Boardsesh database not found'
     return NextResponse.json(
-      { error: 'Boardsesh database not found', setters: [] },
+      { error: message, setters: [] },
       { status: 503 },
     )
   }

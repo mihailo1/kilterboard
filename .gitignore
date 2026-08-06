@@ -34,8 +34,10 @@ yarn-error.log*
 next-env.d.ts
 *.tsbuildinfo
 
-# Boardsesh climb DBs (download via scripts/sync-boardsesh.mjs)
+# Boardsesh climb DBs (download via scripts/sync-boardsesh.mjs — built on Vercel)
 data/boardsesh/*.db
+data/boardsesh/*.db.gz
+data/boardsesh/*.tmp.db
 data/boardsesh/kilter-layout-1.db
 !data/boardsesh/.gitkeep
 

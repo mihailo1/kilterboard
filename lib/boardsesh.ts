@@ -2,10 +2,15 @@
  * Query Boardsesh-derived local SQLite (12×12 kickboard subset).
  * Uses denormalized `search_rows` (angle × climb stats) for fast filters.
  * DB built by: node scripts/sync-boardsesh.mjs
+ *
+ * On Vercel the DB is not in git. Build ships `kilter-12x12.db.gz`; we gunzip
+ * into `/tmp` on first request (or open a local `.db` in dev).
  */
 
 import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
+import { gunzipSync } from 'node:zlib'
 import { DatabaseSync } from 'node:sqlite'
 import { analyzeClimbFrames } from '@/lib/aurora/board'
 import { difficultyToGrade } from '@/lib/grades'
@@ -13,6 +18,7 @@ import type { Climb } from '@/types'
 
 const SIZE_ID = 10
 const DEFAULT_ANGLE = 40
+const DB_NAME = 'kilter-12x12.db'
 
 export interface BoardseshMeta {
   source: string
@@ -66,30 +72,123 @@ const SORT_SQL: Record<string, string> = {
   Newest: 'r.published_at DESC NULLS LAST, r.created_at DESC',
 }
 
-function dbPath(): string {
-  return path.join(process.cwd(), 'data', 'boardsesh', 'kilter-12x12.db')
+function localDbPath(): string {
+  return path.join(process.cwd(), 'data', 'boardsesh', DB_NAME)
 }
 
+function localGzPath(): string {
+  return `${localDbPath()}.gz`
+}
+
+function tmpDbPath(): string {
+  return path.join(os.tmpdir(), DB_NAME)
+}
+
+/** True if a usable DB file is already on disk (local, /tmp, or gz in cwd). */
 export function boardseshDbExists(): boolean {
-  return fs.existsSync(dbPath())
+  return (
+    fs.existsSync(localDbPath()) ||
+    fs.existsSync(tmpDbPath()) ||
+    fs.existsSync(localGzPath())
+  )
 }
 
 let cachedDb: DatabaseSync | null = null
+let cachedPath: string | null = null
+let ensurePromise: Promise<string> | null = null
+let hasExtraCols: boolean | null = null
+
+function openDb(dbFile: string): DatabaseSync {
+  if (cachedDb && cachedPath === dbFile) return cachedDb
+  if (cachedDb) {
+    try {
+      cachedDb.close()
+    } catch {
+      /* ignore */
+    }
+    cachedDb = null
+  }
+  const db = new DatabaseSync(dbFile, { readOnly: true })
+  try {
+    db.exec('PRAGMA query_only=ON')
+  } catch {
+    /* older sqlite */
+  }
+  cachedDb = db
+  cachedPath = dbFile
+  hasExtraCols = null
+  return db
+}
+
+/**
+ * Resolve a readable SQLite path: local db → /tmp db → gunzip cwd .gz → /tmp.
+ * Optional BOARDSESH_DB_URL (http(s) to .db or .db.gz) as last resort.
+ */
+export async function ensureBoardseshDb(): Promise<string> {
+  if (ensurePromise) return ensurePromise
+  ensurePromise = (async () => {
+    const local = localDbPath()
+    if (fs.existsSync(local)) return local
+
+    const tmp = tmpDbPath()
+    if (fs.existsSync(tmp)) return tmp
+
+    const gz = localGzPath()
+    if (fs.existsSync(gz)) {
+      const raw = fs.readFileSync(gz)
+      fs.writeFileSync(tmp, gunzipSync(raw))
+      return tmp
+    }
+
+    const url = process.env.BOARDSESH_DB_URL?.trim()
+    if (url) {
+      const res = await fetch(url)
+      if (!res.ok) {
+        throw new Error(`BOARDSESH_DB_URL fetch failed: HTTP ${res.status}`)
+      }
+      const buf = Buffer.from(await res.arrayBuffer())
+      const isGz =
+        url.endsWith('.gz') ||
+        (buf.length >= 2 && buf[0] === 0x1f && buf[1] === 0x8b)
+      fs.writeFileSync(tmp, isGz ? gunzipSync(buf) : buf)
+      return tmp
+    }
+
+    throw new Error(
+      'Boardsesh DB missing. Locally: npm run sync:climbs. ' +
+        'On Vercel: ensure build runs scripts/ensure-boardsesh-db.mjs (see package.json).',
+    )
+  })().catch((err) => {
+    ensurePromise = null
+    throw err
+  })
+
+  return ensurePromise
+}
 
 function getDb(): DatabaseSync {
-  const p = dbPath()
-  if (!fs.existsSync(p)) {
-    throw new Error('Boardsesh DB missing. Run: node scripts/sync-boardsesh.mjs')
+  const local = localDbPath()
+  if (fs.existsSync(local)) return openDb(local)
+  const tmp = tmpDbPath()
+  if (fs.existsSync(tmp)) return openDb(tmp)
+  throw new Error(
+    'Boardsesh DB not ready. Call ensureBoardseshDb() first (API routes do this).',
+  )
+}
+
+function searchRowsHasExtras(db: DatabaseSync): boolean {
+  if (hasExtraCols != null) return hasExtraCols
+  try {
+    const cols = db.prepare('PRAGMA table_info(search_rows)').all() as Array<{
+      name: string
+    }>
+    const names = new Set(cols.map((c) => c.name))
+    hasExtraCols =
+      names.has('hold_count') && names.has('frame_count') && names.has('is_route')
+  } catch {
+    hasExtraCols = false
   }
-  if (!cachedDb) {
-    cachedDb = new DatabaseSync(p, { readOnly: true })
-    try {
-      cachedDb.exec('PRAGMA query_only=ON')
-    } catch {
-      /* older sqlite */
-    }
-  }
-  return cachedDb
+  return hasExtraCols
 }
 
 export function getBoardseshMeta(): BoardseshMeta | null {
@@ -118,7 +217,9 @@ export function getBoardseshMeta(): BoardseshMeta | null {
 function hasSearchRows(db: DatabaseSync): boolean {
   try {
     const row = db
-      .prepare("SELECT 1 AS ok FROM sqlite_master WHERE type='table' AND name='search_rows'")
+      .prepare(
+        "SELECT 1 AS ok FROM sqlite_master WHERE type='table' AND name='search_rows'",
+      )
       .get() as { ok?: number } | undefined
     return !!row
   } catch {
@@ -134,6 +235,8 @@ export function searchClimbs(params: SearchParams = {}): SearchResult {
     )
   }
 
+  const extras = searchRowsHasExtras(db)
+
   // undefined or < 0 → all angles (one list row per climb×angle); else degrees
   const angleRaw = params.selectedAngle
   const allAngles =
@@ -142,7 +245,8 @@ export function searchClimbs(params: SearchParams = {}): SearchResult {
   const limit = Math.min(Math.max(params.numResults ?? 25, 1), 100)
   const offset = Math.max(params.offset ?? 0, 0)
   const sort =
-    SORT_SQL[params.selectedSort ?? 'Popularity Desc'] ?? SORT_SQL['Popularity Desc']
+    SORT_SQL[params.selectedSort ?? 'Popularity Desc'] ??
+    SORT_SQL['Popularity Desc']
   const minAscents = Math.max(params.minAscents ?? 0, 0)
   const minDifficulty = params.minDifficulty
   const maxDifficulty = params.maxDifficulty
@@ -185,12 +289,18 @@ export function searchClimbs(params: SearchParams = {}): SearchResult {
     where.push('r.quality >= @minQuality')
     filterBinds.minQuality = minQuality
   }
-  // Multi-frame routes use Aurora delimiter `,"` between deltas
+
   const kind = params.climbKind ?? 'both'
   if (kind === 'boulders') {
-    where.push(`(r.frames IS NULL OR instr(r.frames, ',"') = 0)`)
+    where.push(
+      extras
+        ? 'COALESCE(r.is_route, 0) = 0'
+        : `(r.frames IS NULL OR instr(r.frames, ',"') = 0)`,
+    )
   } else if (kind === 'routes') {
-    where.push(`instr(r.frames, ',"') > 0`)
+    where.push(
+      extras ? 'r.is_route = 1' : `instr(r.frames, ',"') > 0`,
+    )
   }
   if (hasGradeFilter || params.requireGrade) {
     where.push('r.difficulty IS NOT NULL')
@@ -201,6 +311,10 @@ export function searchClimbs(params: SearchParams = {}): SearchResult {
   const countRow = db
     .prepare(`SELECT COUNT(*) AS n FROM search_rows r WHERE ${whereSql}`)
     .get(filterBinds) as { n: number }
+
+  const selectExtras = extras
+    ? ', r.hold_count, r.frame_count, r.is_route'
+    : ''
 
   const rows = db
     .prepare(
@@ -215,6 +329,7 @@ export function searchClimbs(params: SearchParams = {}): SearchResult {
          r.difficulty,
          r.ascents,
          r.quality
+         ${selectExtras}
        FROM search_rows r
        WHERE ${whereSql}
        ORDER BY ${sort}
@@ -231,11 +346,25 @@ export function searchClimbs(params: SearchParams = {}): SearchResult {
     difficulty: number | null
     ascents: number | null
     quality: number | null
+    hold_count?: number | null
+    frame_count?: number | null
+    is_route?: number | null
   }>
 
   const climbs: Climb[] = rows.map((r) => {
     const frames = r.frames ?? ''
-    const stats = analyzeClimbFrames(frames)
+    let holdCount = r.hold_count ?? undefined
+    let frameCount = r.frame_count ?? undefined
+    let isRoute =
+      r.is_route != null ? r.is_route === 1 : frames.includes(',"')
+
+    if (holdCount == null || frameCount == null) {
+      const stats = analyzeClimbFrames(frames)
+      holdCount = stats.holdCount
+      frameCount = stats.frameCount
+      isRoute = stats.isRoute
+    }
+
     return {
       id: r.uuid.toLowerCase(),
       name: r.name,
@@ -246,9 +375,9 @@ export function searchClimbs(params: SearchParams = {}): SearchResult {
       difficulty: r.difficulty,
       ascents: r.ascents,
       quality: r.quality,
-      holdCount: stats.holdCount,
-      moveCount: stats.isRoute ? stats.moveCount : undefined,
-      frameCount: stats.frameCount > 0 ? stats.frameCount : undefined,
+      holdCount: holdCount ?? undefined,
+      moveCount: isRoute ? holdCount : undefined,
+      frameCount: frameCount != null && frameCount > 0 ? frameCount : undefined,
       publishedAt: r.published_at,
       source: 'boardsesh',
     }
