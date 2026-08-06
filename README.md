@@ -1,12 +1,13 @@
 # Kilterboard
 
-**v1.0.0** — Web app for the [Kilter Board](https://settercloset.com/pages/kilter-board) (12×12 + kickboard / Aurora).
+**v1.1.0** — Web app for the [Kilter Board](https://settercloset.com/pages/kilter-board) (12×12 + kickboard / Aurora).
 
-Browse community climbs, set your own boulders, light a physical board over **Web Bluetooth**, and generate holds with **Hold AR** — a local ONNX transformer that runs entirely in the browser (no cloud AI).
+Browse community climbs, set your own boulders, light a physical board over **Web Bluetooth**, and generate holds with **Hold AR** — a local ONNX transformer that runs entirely in the browser (no cloud AI). Installable as a **PWA** (standalone display, home-screen icons, floating dock nav).
 
 ![Node](https://img.shields.io/badge/node-%E2%89%A522-brightgreen)
 ![License](https://img.shields.io/badge/license-unofficial-lightgrey)
 ![AI](https://img.shields.io/badge/AI-local%20ONNX-blue)
+![PWA](https://img.shields.io/badge/PWA-standalone-purple)
 
 ## Features
 
@@ -15,7 +16,7 @@ Browse community climbs, set your own boulders, light a physical board over **We
 - **Light board** — Web Bluetooth to Aurora / Kilter LEDs (`@hangtime/grip-connect`)
 - **Hold AR** — local neural generator (causal Transformer → ONNX → Web Worker)
 - **Playground** — `/playground` sandbox to try generation + tweak holds
-- **PWA-friendly** icons + dark UI (English UI only)
+- **PWA** — installable standalone app, glass dock nav, safe areas, maskable icons
 
 ## Requirements
 
@@ -143,4 +144,5 @@ Unofficial reverse-engineered client. **Not affiliated** with Aurora Climbing, K
 
 ## Version
 
+**1.1.0** — PWA polish (dock nav, install prompt, safe areas, maskable icons).  
 **1.0.0** — first public Hold AR release (local transformer + catalog + Set + BLE).

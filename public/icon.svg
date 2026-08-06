@@ -16,8 +16,24 @@
       <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.22"/>
       <stop offset="100%" stop-color="#000000" stop-opacity="0.15"/>
     </linearGradient>
+    <clipPath id="disc">
+      <circle cx="256" cy="256" r="246"/>
+    </clipPath>
   </defs>
   <circle cx="256" cy="256" r="246" fill="url(#g)"/>
   <circle cx="256" cy="256" r="246" fill="url(#shine)"/>
+  <g clip-path="url(#disc)" opacity="0.95">
+    <!-- mini hold grid -->
+    <circle cx="176" cy="320" r="14" fill="#22C55E" fill-opacity="0.92"/>
+    <circle cx="224" cy="272" r="12" fill="#22D3EE" fill-opacity="0.85"/>
+    <circle cx="272" cy="224" r="12" fill="#22D3EE" fill-opacity="0.8"/>
+    <circle cx="320" cy="176" r="14" fill="#E879F9" fill-opacity="0.92"/>
+    <circle cx="176" cy="224" r="9" fill="#FFFFFF" fill-opacity="0.22"/>
+    <circle cx="224" cy="176" r="9" fill="#FFFFFF" fill-opacity="0.18"/>
+    <circle cx="272" cy="320" r="9" fill="#FFFFFF" fill-opacity="0.18"/>
+    <circle cx="320" cy="272" r="9" fill="#FFFFFF" fill-opacity="0.22"/>
+    <circle cx="224" cy="320" r="8" fill="#FFFFFF" fill-opacity="0.14"/>
+    <circle cx="272" cy="176" r="8" fill="#FFFFFF" fill-opacity="0.14"/>
+  </g>
   <circle cx="256" cy="256" r="246" fill="none" stroke="url(#rim)" stroke-width="3"/>
 </svg>

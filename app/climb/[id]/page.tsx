@@ -64,8 +64,8 @@ export default async function ClimbPage({ params, searchParams }: PageProps) {
         </Link>
       </div>
 
-      <header className="space-y-3">
-        <h1 className="ui-title text-2xl sm:text-3xl">{climb.name}</h1>
+      <header className="app-header space-y-3">
+        <h1 className="app-header-title text-2xl sm:text-3xl">{climb.name}</h1>
         {climb.notes && <p className="text-sm text-muted">{climb.notes}</p>}
         <div className="flex flex-wrap items-center gap-2 pt-0.5">
           <span className="rounded-full bg-accent-soft px-3 py-1 text-sm font-bold text-accent ring-1 ring-accent/25">

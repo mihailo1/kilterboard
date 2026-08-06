@@ -397,7 +397,7 @@ export function SetStudio() {
     name.trim() || namelessDraftTitle(new Date(createdAtRef.current))
 
   return (
-    <div className="flex flex-col gap-4 pb-28 sm:pb-8">
+    <div className="flex flex-col gap-4 pb-36 sm:pb-10">
       {/* Drafts bar */}
       <section className="ui-card space-y-3 p-3 sm:p-4">
         <div className="flex flex-wrap items-center gap-2">
@@ -770,7 +770,7 @@ export function SetStudio() {
       </section>
 
       {/* Sticky palette — only in palette mode */}
-      <section className="ui-card sticky bottom-3 z-20 space-y-3 p-3 shadow-[0_12px_40px_-12px_rgb(0_0_0_/_0.65)] sm:static sm:bottom-auto sm:p-4">
+      <section className="ui-card sticky z-20 space-y-3 p-3 shadow-[0_12px_40px_-12px_rgb(0_0_0_/_0.65)] max-sm:bottom-[calc(var(--app-dock-clearance)+0.35rem)] sm:static sm:bottom-auto sm:p-4">
         {inputMode === 'palette' && (
           <>
             <div className="flex items-center justify-between gap-2">

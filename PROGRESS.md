@@ -15,6 +15,14 @@
 
 ---
 
+## 2026-08-06 — v1.1.0 PWA polish
+
+- Floating glass **dock** (Climbs / Set / Hold AR) + safe-area insets
+- Install chip (`beforeinstallprompt` + iOS tip), standalone CSS
+- Manifest: shortcuts, maskable icons, categories; new icon art
+- Footer above dock with version **1.1.0**; sticky Set palette clears dock
+- Home header app-style title; mobile mode switch hidden (dock is primary)
+
 ## 2026-08-06 — Remove Approve/tags from playground
 
 - Playground is gen + paint only (Hold AR); no feedback labels UI

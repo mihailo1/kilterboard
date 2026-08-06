@@ -1,7 +1,6 @@
 'use client'
 
 import { Suspense, useCallback } from 'react'
-import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { ClimbList } from '@/components/ClimbList'
 import { SetStudio } from '@/components/SetStudio'
@@ -35,7 +34,6 @@ function HomeShellInner() {
         router.replace(`${pathname}?mode=set`, { scroll: false })
         return
       }
-      // Climbs: drop mode param, keep other climb filters if any
       const qs = new URLSearchParams(searchParams.toString())
       qs.delete('mode')
       const s = qs.toString()
@@ -46,25 +44,25 @@ function HomeShellInner() {
 
   return (
     <main className="ui-shell">
-      <header className="space-y-4">
-        <div className="flex items-center gap-2.5">
+      <header className="app-header">
+        <div className="app-header-brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/icon.svg"
             alt=""
-            width={32}
-            height={32}
-            className="h-8 w-8 shrink-0 drop-shadow-[0_2px_8px_rgb(139_92_246_/_0.35)]"
+            width={40}
+            height={40}
+            className="app-header-icon"
           />
-          <p className="ui-eyebrow">Kilter · 12×12 + kickboard</p>
-          <Link
-            href="/playground"
-            className="ml-auto text-[11px] font-medium text-faint transition hover:text-accent"
-          >
-            AI sandbox
-          </Link>
+          <div className="min-w-0">
+            <p className="ui-eyebrow">Kilter · 12×12 + kickboard</p>
+            <h1 className="app-header-title">
+              {mode === 'set' ? 'Set' : 'Climbs'}
+            </h1>
+          </div>
         </div>
 
+        {/* Desktop mode switch — mobile uses the floating dock */}
         <ModeSwitch mode={mode} onChange={setMode} />
       </header>
 
@@ -84,7 +82,7 @@ function ModeSwitch({
     <div
       role="tablist"
       aria-label="Main mode"
-      className="relative grid grid-cols-2 gap-1 rounded-[1.35rem] border border-border bg-surface/90 p-1.5 shadow-[0_1px_0_rgb(255_255_255_/_0.04)_inset,0_12px_40px_-20px_rgb(0_0_0_/_0.5)]"
+      className="mode-switch relative hidden grid-cols-2 gap-1 rounded-[1.35rem] border border-border bg-surface/90 p-1.5 shadow-[0_1px_0_rgb(255_255_255_/_0.04)_inset,0_12px_40px_-20px_rgb(0_0_0_/_0.5)] sm:grid"
     >
       <span
         aria-hidden
@@ -100,7 +98,7 @@ function ModeSwitch({
         role="tab"
         aria-selected={mode === 'climbs'}
         onClick={() => onChange('climbs')}
-        className={`relative z-10 rounded-[1.1rem] px-4 py-3.5 text-center text-base font-semibold tracking-tight transition-colors sm:py-4 sm:text-lg ${
+        className={`relative z-10 rounded-[1.1rem] px-4 py-3 text-center text-sm font-semibold tracking-tight transition-colors sm:text-base ${
           mode === 'climbs' ? 'text-[#120f1c]' : 'text-muted hover:text-ink-soft'
         }`}
       >
@@ -111,7 +109,7 @@ function ModeSwitch({
         role="tab"
         aria-selected={mode === 'set'}
         onClick={() => onChange('set')}
-        className={`relative z-10 rounded-[1.1rem] px-4 py-3.5 text-center text-base font-semibold tracking-tight transition-colors sm:py-4 sm:text-lg ${
+        className={`relative z-10 rounded-[1.1rem] px-4 py-3 text-center text-sm font-semibold tracking-tight transition-colors sm:text-base ${
           mode === 'set' ? 'text-[#120f1c]' : 'text-muted hover:text-ink-soft'
         }`}
       >

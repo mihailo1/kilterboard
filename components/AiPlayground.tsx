@@ -109,41 +109,27 @@ export function AiPlayground() {
 
   return (
     <main className="ui-shell">
-      <header className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2.5">
-          <Link
-            href="/"
-            className="ui-btn-quiet text-xs"
-            aria-label="Back to home"
-          >
-            ← Climbs
-          </Link>
-          <Link href="/?mode=set" className="ui-btn-quiet text-xs">
-            Set
-          </Link>
-          <span className="ml-auto rounded-full border border-border bg-surface/80 px-2.5 py-0.5 text-[10px] uppercase tracking-wide text-faint">
-            /playground
-          </span>
-        </div>
-        <div className="flex items-center gap-2.5">
+      <header className="app-header space-y-3">
+        <div className="app-header-brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/icon.svg"
             alt=""
-            width={32}
-            height={32}
-            className="h-8 w-8 shrink-0 drop-shadow-[0_2px_8px_rgb(139_92_246_/_0.35)]"
+            width={40}
+            height={40}
+            className="app-header-icon"
           />
-          <div>
-            <p className="ui-eyebrow">AI sandbox</p>
-            <h1 className="font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
-              Playground
-            </h1>
+          <div className="min-w-0">
+            <p className="ui-eyebrow">Local ONNX · browser</p>
+            <h1 className="app-header-title">Hold AR</h1>
           </div>
+          <span className="ml-auto hidden rounded-full border border-border bg-surface/80 px-2.5 py-0.5 text-[10px] uppercase tracking-wide text-faint sm:inline">
+            playground
+          </span>
         </div>
         <p className="max-w-2xl text-sm leading-relaxed text-muted">
-          Try Hold AR generations and tweak holds with the paint tools. For
-          saving drafts to the board editor, use{' '}
+          Generate boulders with the on-device model and tweak holds with paint.
+          Save drafts in{' '}
           <Link href="/?mode=set" className="text-accent hover:text-accent-hover">
             Set
           </Link>
