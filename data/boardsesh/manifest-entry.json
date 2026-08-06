@@ -1,0 +1,22 @@
+{
+  "boardType": "kilter",
+  "layoutId": 1,
+  "key": "board-snapshots/v1/kilter/1/2026-07-30T09-41-05-326Z.db",
+  "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/1/2026-07-30T09-41-05-326Z.db",
+  "bytes": 271314944,
+  "contentEncoding": "identity",
+  "builtAt": "2026-07-30T09:41:05.326Z",
+  "schemaVersion": 4,
+  "tables": {
+    "board_climbs": {
+      "rowCount": 373046,
+      "watermarkUpdatedAt": "2026-07-30T09:13:20.168384Z",
+      "watermarkSyncSeq": "1038532"
+    },
+    "board_climb_stats": {
+      "rowCount": 355145,
+      "watermarkUpdatedAt": "2026-07-30T09:26:58.560373Z",
+      "watermarkSyncSeq": "139730062"
+    }
+  }
+}

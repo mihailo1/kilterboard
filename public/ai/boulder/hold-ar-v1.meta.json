@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "model": "hold-ar-v1",
+  "onnx": "hold-ar-v1.onnx",
+  "placementIndex": "placement_index.json",
+  "vocab": 1905,
+  "nPlacements": 476,
+  "maxLen": 22,
+  "stopClass": 1904,
+  "gradeNorm": "(difficulty - 10) / 23",
+  "inputs": [
+    "seq",
+    "mask",
+    "grade"
+  ],
+  "outputs": [
+    "logits"
+  ],
+  "arch": "transformer",
+  "dModel": 384,
+  "nLayers": 4,
+  "nHeads": 6,
+  "quantized": false,
+  "valAcc": 0.19929330851500143,
+  "valAccTop5": 0.44794460043537243,
+  "valLoss": 3.4887100278938195
+}

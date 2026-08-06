@@ -1,0 +1,64 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# env
+.env
+.env*.local
+
+# typescript
+next-env.d.ts
+*.tsbuildinfo
+
+# Boardsesh climb DBs (download via scripts/sync-boardsesh.mjs)
+data/boardsesh/*.db
+data/boardsesh/kilter-layout-1.db
+!data/boardsesh/.gitkeep
+
+# Local AI feedback exports / patches (from /playground)
+data/feedback/*
+!data/feedback/.gitkeep
+
+# Plan B ML datasets (local train data)
+data/ml/climbs*
+data/ml/split.json
+data/ml/stats.json
+data/ml/placement_index.json
+!data/ml/.gitkeep
+
+# Python Hold-AR train env / artifacts (public ONNX is tracked separately)
+ml/hold-ar/.venv/
+ml/hold-ar/artifacts/
+public/ai/boulder/*-dev.onnx
+
+# sqlite side files
+data/boardsesh/*.db-shm
+data/boardsesh/*.db-wal
+
+__pycache__/
+*.pyc
+.Python

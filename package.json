@@ -1,0 +1,36 @@
+{
+  "name": "kilterboard",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "sync:climbs": "node scripts/sync-boardsesh.mjs",
+    "train:boulder-ai": "node scripts/train-boulder-ai.mjs",
+    "eval:boulder-ai": "node scripts/eval-boulder-ai.mjs",
+    "apply-feedback": "node scripts/apply-feedback.mjs",
+    "ml:export-sequences": "node scripts/ml/export-climb-sequences.mjs",
+    "ml:export-onnx": "cd ml/hold-ar && ./.venv/bin/python export_onnx.py --ckpt artifacts/hold-ar-v1.pt --out artifacts/hold-ar-v1.onnx --copy-public"
+  },
+  "dependencies": {
+    "@hangtime/grip-connect": "^0.15.0",
+    "@radix-ui/react-slider": "^1.4.7",
+    "next": "^15.3.3",
+    "onnxruntime-web": "^1.20.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.10",
+    "@types/node": "^22.15.30",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
+    "tailwindcss": "^4.1.10",
+    "typescript": "^5.8.3"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

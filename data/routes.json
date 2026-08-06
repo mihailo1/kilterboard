@@ -1,0 +1,48 @@
+[
+  {
+    "id": "gravity-gauntlet",
+    "name": "7, 4.11.19",
+    "grade": "8a/V11",
+    "angle": 50,
+    "setter": "KilterComp #15",
+    "notes": "Gravity Gauntlet · KilterComp#15 (12x12)",
+    "source": "climbest.app/comp/30/route/881",
+    "frames": "p1187r12p1207r12p1226r15p1265r13p1270r13p1298r13p1352r13p1382r14p1451r15p1478r15p1489r15p1495r15p1503r15p1509r15"
+  },
+  {
+    "id": "easy-warmup",
+    "name": "Easy Warmup",
+    "grade": "5+/V1",
+    "angle": 40,
+    "setter": "Sample",
+    "notes": "Short juggy line for testing lights",
+    "frames": "p1451r12p1503r12p1495r13p1478r13p1489r13p1187r14"
+  },
+  {
+    "id": "crimp-ladder",
+    "name": "Crimp Ladder",
+    "grade": "6c/V5",
+    "angle": 45,
+    "setter": "Sample",
+    "notes": "Vertical progression on the middle of the wall",
+    "frames": "p1226r12p1503r12p1495r15p1265r13p1298r13p1352r13p1382r14"
+  },
+  {
+    "id": "cross-body",
+    "name": "Cross Body",
+    "grade": "7a/V6",
+    "angle": 50,
+    "setter": "Sample",
+    "notes": "Big lateral moves left → right",
+    "frames": "p1226r12p1509r15p1265r13p1270r13p1207r13p1352r14"
+  },
+  {
+    "id": "footwork-focus",
+    "name": "Footwork Focus",
+    "grade": "6b/V4",
+    "angle": 40,
+    "setter": "Sample",
+    "notes": "Lots of feet, steady hands",
+    "frames": "p1451r12p1478r12p1495r15p1503r15p1489r15p1226r15p1265r13p1298r13p1352r14"
+  }
+]
