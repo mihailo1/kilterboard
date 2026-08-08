@@ -14,6 +14,7 @@ import {
   type ClimbKind,
 } from '@/lib/boardsesh-client'
 import { DualRangeSlider, SingleRangeSlider } from '@/components/RangeSliders'
+import { writeStoredListQuery } from '@/lib/climb-list-url'
 
 const PAGE_SIZE = 25
 const DEFAULT_MIN_DIFF = 10
@@ -221,6 +222,37 @@ function ClimbListInner() {
   /** Last query string we wrote — ignore matching searchParams updates */
   const lastWrittenQs = useRef(filtersToSearchParams(initial).toString())
 
+  /** Current list filters as query string (for climb detail `from` + sessionStorage). */
+  const listQs = useMemo(
+    () =>
+      filtersToSearchParams({
+        name: nameQ,
+        setter: setterQ,
+        angle: angleQ,
+        angleEnabled,
+        minDifficulty: minDiffQ,
+        maxDifficulty: maxDiffQ,
+        sort,
+        minAscents,
+        minQuality,
+        climbKind,
+        numResults,
+      }).toString(),
+    [
+      nameQ,
+      setterQ,
+      angleQ,
+      angleEnabled,
+      minDiffQ,
+      maxDiffQ,
+      sort,
+      minAscents,
+      minQuality,
+      climbKind,
+      numResults,
+    ],
+  )
+
   const applyFilters = useCallback((p: FilterState) => {
     // Keep restored `n` — don't let the filter-change effect reset the page
     skipPageReset.current = true
@@ -358,41 +390,14 @@ function ClimbListInner() {
     climbKind,
   ])
 
-  // Sync filters → browser URL (state is source of truth while interacting)
+  // Sync filters → browser URL + sessionStorage (state is source of truth while interacting)
   useEffect(() => {
-    const qs = filtersToSearchParams({
-      name: nameQ,
-      setter: setterQ,
-      angle: angleQ,
-      angleEnabled,
-      minDifficulty: minDiffQ,
-      maxDifficulty: maxDiffQ,
-      sort,
-      minAscents,
-      minQuality,
-      climbKind,
-      numResults,
-    })
-    const next = qs.toString()
-    if (next === lastWrittenQs.current) return
-    lastWrittenQs.current = next
-    const href = next ? `${pathname}?${next}` : pathname
+    writeStoredListQuery(listQs)
+    if (listQs === lastWrittenQs.current) return
+    lastWrittenQs.current = listQs
+    const href = listQs ? `${pathname}?${listQs}` : pathname
     router.replace(href, { scroll: false })
-  }, [
-    nameQ,
-    setterQ,
-    angleQ,
-    angleEnabled,
-    minDiffQ,
-    maxDiffQ,
-    sort,
-    minAscents,
-    minQuality,
-    climbKind,
-    numResults,
-    pathname,
-    router,
-  ])
+  }, [listQs, pathname, router])
 
   // Browser back/forward: rehydrate when URL changes externally
   useEffect(() => {
@@ -912,7 +917,11 @@ function ClimbListInner() {
         {loading && climbs.length === 0 && <SkeletonList />}
 
         {climbs.map((climb) => (
-          <ClimbRow key={`${climb.id}-${climb.angle}`} climb={climb} />
+          <ClimbRow
+            key={`${climb.id}-${climb.angle}`}
+            climb={climb}
+            listQs={listQs}
+          />
         ))}
 
         {!loading && climbs.length === 0 && !error && (
@@ -953,8 +962,8 @@ function isRouteClimb(climb: Climb): boolean {
   return (climb.frameCount != null && climb.frameCount > 1) || climb.frames.includes(',"')
 }
 
-function ClimbRow({ climb }: { climb: Climb }) {
-  const href = buildClimbHref(climb)
+function ClimbRow({ climb, listQs }: { climb: Climb; listQs: string }) {
+  const href = buildClimbHref(climb, listQs)
   const tone = gradeTone(climb.difficulty ?? null)
   const quality =
     climb.quality != null && climb.quality > 0 ? climb.quality.toFixed(1) : null
@@ -1086,7 +1095,11 @@ function formatCount(n: number): string {
   return n.toLocaleString()
 }
 
-export function buildClimbHref(climb: Climb): string {
+/**
+ * Climb detail URL. Pass `listQs` (current `/?…` filters) so “All climbs”
+ * can restore search/filters via the `from` param.
+ */
+export function buildClimbHref(climb: Climb, listQs = ''): string {
   const qs = new URLSearchParams({
     name: climb.name,
     grade: climb.grade,
@@ -1096,5 +1109,6 @@ export function buildClimbHref(climb: Climb): string {
   if (climb.setter) qs.set('setter', climb.setter)
   if (climb.ascents != null)
     qs.set('notes', `${climb.ascents.toLocaleString()} ascents`)
+  if (listQs) qs.set('from', listQs)
   return `/climb/${climb.id}?${qs.toString()}`
 }

@@ -3,18 +3,16 @@
  * Download latest Boardsesh Kilter layout snapshot and build a slim 12×12 DB.
  *
  * Usage:
- *   node scripts/sync-boardsesh.mjs
- *   node scripts/sync-boardsesh.mjs --keep-full   # keep full layout download
+ *   node scripts/sync-boardsesh.mjs              # skip if already current
+ *   node scripts/sync-boardsesh.mjs --force      # always rebuild
+ *   node scripts/sync-boardsesh.mjs --check-only # exit 0=fresh, 2=stale/missing, 1=error
+ *   node scripts/sync-boardsesh.mjs --keep-full  # keep full layout download
  *
  * Writes:
  *   data/boardsesh/manifest.json
+ *   data/boardsesh/manifest-entry.json
  *   data/boardsesh/kilter-12x12.db      (~120MB slim search_rows + meta)
  *   data/boardsesh/kilter-12x12.db.gz   (~37MB — preferred for Vercel function tracing)
- *
- * Slim format (deploy-friendly):
- *   search_rows: uuid, name, setter, frames, dates, angle, difficulty, ascents,
- *                quality, hold_count, frame_count, is_route
- *   meta: snapshot provenance
  */
 
 import {
@@ -22,6 +20,7 @@ import {
   createWriteStream,
   existsSync,
   mkdirSync,
+  readFileSync,
   statSync,
   unlinkSync,
   writeFileSync,
@@ -44,11 +43,17 @@ const LAYOUT_ID = 1
 /** 12×12 with kickboard — matches board viewer / Kilter Lookup product_size_id_10 */
 const SIZE_ID = 10
 const KEEP_FULL = process.argv.includes('--keep-full')
+const FORCE = process.argv.includes('--force')
+const CHECK_ONLY = process.argv.includes('--check-only')
+
+const EXIT_FRESH = 0
+const EXIT_ERROR = 1
+const EXIT_STALE = 2
 
 async function main() {
   mkdirSync(OUT_DIR, { recursive: true })
 
-  console.log('Fetching manifest…')
+  console.log('Fetching Boardsesh manifest…')
   const manifest = await fetchJson(MANIFEST_URL)
   writeFileSync(path.join(OUT_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2))
 
@@ -59,11 +64,50 @@ async function main() {
     throw new Error(`No snapshot for ${BOARD_TYPE} layout ${LAYOUT_ID}`)
   }
 
-  console.log(`Snapshot builtAt=${entry.builtAt}`)
+  const remoteBuiltAt = entry.builtAt ?? null
+  const remoteKey = entry.key ?? null
+  const local = readLocalProvenance()
+
+  console.log(`Remote snapshot builtAt=${remoteBuiltAt}`)
   console.log(
     `  climbs=${entry.tables.board_climbs.rowCount}  bytes≈${(entry.bytes / 1e6).toFixed(1)}MB`,
   )
+  if (local.builtAt) {
+    console.log(`Local  snapshot builtAt=${local.builtAt}${local.source ? ` (${local.source})` : ''}`)
+  } else {
+    console.log('Local  snapshot: none')
+  }
+
+  const pinMatches =
+    remoteBuiltAt != null &&
+    local.builtAt != null &&
+    local.builtAt === remoteBuiltAt &&
+    (remoteKey == null || local.key == null || local.key === remoteKey)
+
+  // Always refresh lightweight provenance files (safe to commit; not the DB)
   writeFileSync(path.join(OUT_DIR, 'manifest-entry.json'), JSON.stringify(entry, null, 2))
+
+  if (CHECK_ONLY) {
+    // CI only needs pin match — no .db in the repo
+    if (!FORCE && pinMatches) {
+      console.log('[check] up to date (pin matches remote)')
+      process.exit(EXIT_FRESH)
+    }
+    console.log(
+      pinMatches
+        ? '[check] force requested'
+        : local.builtAt
+          ? '[check] stale — remote snapshot is newer'
+          : '[check] missing pin — treat as stale',
+    )
+    process.exit(EXIT_STALE)
+  }
+
+  // Full sync: skip heavy download only when pin matches AND slim files exist
+  if (!FORCE && pinMatches && local.hasDb) {
+    console.log('Already up to date — skip download (pass --force to rebuild)')
+    return
+  }
 
   const fullPath = path.join(OUT_DIR, 'kilter-layout-1.db')
   const subsetPath = path.join(OUT_DIR, 'kilter-12x12.db')
@@ -89,6 +133,48 @@ async function main() {
 }
 
 /**
+ * Local built_at from slim meta table, else manifest-entry.json.
+ */
+function readLocalProvenance() {
+  const subsetPath = path.join(OUT_DIR, 'kilter-12x12.db')
+  const gzPath = `${subsetPath}.gz`
+  const hasDb = existsSync(subsetPath) || existsSync(gzPath)
+  let builtAt = null
+  let key = null
+  let source = null
+
+  if (existsSync(subsetPath)) {
+    try {
+      const db = new DatabaseSync(subsetPath, { readOnly: true })
+      const row = db.prepare('SELECT built_at FROM meta LIMIT 1').get()
+      db.close()
+      if (row?.built_at) {
+        builtAt = String(row.built_at)
+        source = 'meta'
+      }
+    } catch {
+      /* corrupt / old schema */
+    }
+  }
+
+  const entryPath = path.join(OUT_DIR, 'manifest-entry.json')
+  if (existsSync(entryPath)) {
+    try {
+      const entry = JSON.parse(readFileSync(entryPath, 'utf8'))
+      if (!builtAt && entry.builtAt) {
+        builtAt = entry.builtAt
+        source = source ?? 'manifest-entry'
+      }
+      if (entry.key) key = entry.key
+    } catch {
+      /* ignore */
+    }
+  }
+
+  return { hasDb, builtAt, key, source }
+}
+
+/**
  * One denormalized search table + meta. Drops climbs/climb_stats copies to cut size ~2×.
  */
 function buildSlimSubset(fullPath, subsetPath, entry) {
@@ -96,7 +182,6 @@ function buildSlimSubset(fullPath, subsetPath, entry) {
 
   const db = new DatabaseSync(fullPath)
 
-  // Work in a temp attach so we can filter before writing the final slim file
   const tmpPath = `${subsetPath}.tmp.db`
   if (existsSync(tmpPath)) unlinkSync(tmpPath)
 
@@ -139,7 +224,6 @@ function buildSlimSubset(fullPath, subsetPath, entry) {
   db.exec('DETACH out')
   db.close()
 
-  // Build final slim DB with precomputed route/hold stats
   const mid = new DatabaseSync(tmpPath)
   const out = new DatabaseSync(subsetPath)
 
@@ -265,5 +349,5 @@ async function download(url, dest) {
 
 main().catch((err) => {
   console.error(err)
-  process.exit(1)
+  process.exit(EXIT_ERROR)
 })

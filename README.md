@@ -1,6 +1,6 @@
 # Kilterboard
 
-**v1.1.0** — Web app for the [Kilter Board](https://settercloset.com/pages/kilter-board) (12×12 + kickboard / Aurora).
+**v1.1.2** — Web app for the [Kilter Board](https://settercloset.com/pages/kilter-board) (12×12 + kickboard / Aurora).
 
 Browse community climbs, set your own boulders, light a physical board over **Web Bluetooth**, and generate holds with **Hold AR** — a local ONNX transformer that runs entirely in the browser (no cloud AI). Installable as a **PWA** (standalone display, home-screen icons, floating dock nav).
 
@@ -54,19 +54,32 @@ Open [http://localhost:3000](http://localhost:3000).
 Climbs come from [Boardsesh board snapshots](https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/manifest.json) (Kilter Original layout), filtered to **product size 10**.
 
 ```bash
-npm run sync:climbs              # slim SQLite + .gz (~120MB / ~37MB)
+npm run sync:climbs              # stale-aware: skip if builtAt already matches CDN
+npm run sync:climbs:force        # always re-download + rebuild slim DB
+npm run sync:climbs:check        # exit 0=fresh, 2=stale (for CI)
 npm run sync:climbs -- --keep-full
 ```
 
-`data/boardsesh/*.db` is **gitignored** (too large for the repo). After clone, run `sync:climbs` once for local dev.
+`data/boardsesh/*.db` is **gitignored** (too large for the repo). Lightweight `manifest.json` / `manifest-entry.json` **are** committed as a snapshot pin.
 
-#### Vercel / production
+**Auto-update**
 
-`/api/climbs` returns **503** if the DB is missing. On Vercel, `npm run build` runs `ensure-boardsesh-db.mjs`, which downloads Boardsesh and builds the slim DB + gzip during the deploy. The function gunzips into `/tmp` on cold start.
+| Where | How |
+|-------|-----|
+| **Local** | `predev` → `ensure:climbs` (manifest check; download only if missing/stale) |
+| **Vercel build** | same ensure — fresh deploy always can rebuild slim from CDN |
+| **Prod (4×/day)** | GitHub Action every **6 hours** compares pin → Vercel Deploy Hook if stale |
 
-Optional override: set `BOARDSESH_DB_URL` to a public `.db` or `.db.gz` URL if you host the file yourself.
+Setup prod refresh once:
 
-Requires **Node ≥ 22** (`node:sqlite`).
+1. Vercel → Deploy Hooks → create hook for `main`
+2. GitHub → Actions secret `VERCEL_DEPLOY_HOOK_URL` = that URL
+
+No always-on backend: serverless cannot hold a shared mutable SQLite. Redeploy = new catalog.
+
+Optional override: set `BOARDSESH_DB_URL` to a public `.db` / `.db.gz` if you host the file yourself.
+
+Requires **Node ≥ 22** (`node:sqlite`). `/api/climbs` returns **503** if the DB is still missing after ensure.
 
 ## Hold AR (local AI)
 
@@ -110,7 +123,7 @@ lib/
   ai/boulder-ai.ts   # Hold AR bridge
   aurora/            # board frames + BLE
   boardsesh.ts       # SQLite search
-  version.ts         # APP_VERSION (1.0.0)
+  version.ts         # APP_VERSION (1.1.2)
 public/ai/           # ONNX + worker + ort wasm
 ml/hold-ar/          # Python train / ONNX export
 scripts/             # sync, train pack, ML export
@@ -152,5 +165,7 @@ Unofficial reverse-engineered client. **Not affiliated** with Aurora Climbing, K
 
 ## Version
 
+**1.1.2** — auto Boardsesh catalog refresh (stale-aware sync, `predev`, 4×/day GitHub → Vercel Deploy Hook).  
+**1.1.1** — restore climb list filters when leaving climb detail (“All climbs”); AppBrand / dock-only nav.  
 **1.1.0** — PWA polish (dock nav, install prompt, safe areas, maskable icons).  
 **1.0.0** — first public Hold AR release (local transformer + catalog + Set + BLE).

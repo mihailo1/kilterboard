@@ -98,8 +98,8 @@ body > * {
     padding-top: 0;
   }
 
-  .app-header-title {
-    letter-spacing: -0.03em;
+  .app-brand-name {
+    letter-spacing: -0.035em;
   }
 
   .install-chip {
@@ -107,30 +107,138 @@ body > * {
   }
 }
 
-/* ——— App chrome (header, dock, footer) ——— */
+/* ——— App chrome (header + dock) ——— */
 
 .app-header {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-}
-
-.app-header-brand {
-  display: flex;
-  align-items: center;
   gap: 0.75rem;
 }
 
-.app-header-icon {
-  height: 2.5rem;
-  width: 2.5rem;
-  flex-shrink: 0;
-  border-radius: 0.85rem;
+/*
+  Brand bar — full-width glass strip:
+  [ orb  Climbs ........................ v1.1.0 ]
+*/
+.app-brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  min-width: 0;
+  width: 100%;
+  padding: 0.55rem 0.7rem 0.55rem 0.55rem;
+  border-radius: 1.15rem;
+  border: 1px solid color-mix(in srgb, var(--color-border-strong) 85%, transparent);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-accent) 8%, transparent),
+      transparent 42%
+    ),
+    color-mix(in srgb, var(--color-surface) 72%, transparent);
   box-shadow:
-    0 2px 12px rgb(139 92 246 / 0.4),
-    0 0 0 1px rgb(255 255 255 / 0.08);
+    0 1px 0 rgb(255 255 255 / 0.05) inset,
+    0 10px 28px -18px rgb(0 0 0 / 0.55);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
 }
 
+.app-brand-left {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.app-brand-mark-wrap {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-canvas) 55%, transparent);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+}
+
+/*
+  Sphere: drop-shadow follows alpha (no rectangular halo gap).
+*/
+.app-brand-mark {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: block;
+  filter: drop-shadow(0 0 7px rgb(139 92 246 / 0.6))
+    drop-shadow(0 0 16px rgb(139 92 246 / 0.32));
+}
+
+.app-brand-name {
+  margin: 0;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 560;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  color: var(--color-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Version as status chip on the right */
+.app-brand-version {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.05em;
+  padding: 0.28rem 0.55rem;
+  border-radius: 9999px;
+  border: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
+  background: color-mix(in srgb, var(--color-canvas-soft) 80%, transparent);
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--color-muted);
+}
+
+.app-brand-version-label {
+  font-weight: 500;
+  color: var(--color-faint);
+  letter-spacing: 0.02em;
+}
+
+@media (min-width: 640px) {
+  .app-brand {
+    padding: 0.65rem 0.85rem 0.65rem 0.65rem;
+    border-radius: 1.25rem;
+  }
+
+  .app-brand-mark-wrap {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .app-brand-mark {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+
+  .app-brand-name {
+    font-size: 1.85rem;
+  }
+
+  .app-brand-version {
+    font-size: 0.75rem;
+    padding: 0.32rem 0.65rem;
+  }
+}
+
+/* Climb detail pages still use title class alone */
 .app-header-title {
   font-family: var(--font-display);
   font-size: 1.65rem;
@@ -138,34 +246,12 @@ body > * {
   letter-spacing: -0.025em;
   line-height: 1.15;
   color: var(--color-ink);
+  margin: 0;
 }
 
 @media (min-width: 640px) {
   .app-header-title {
     font-size: 1.85rem;
-  }
-}
-
-.app-footer {
-  border-top: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
-  background: color-mix(in srgb, var(--color-canvas) 88%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  /* Dock sits fixed above home indicator — leave room */
-  padding-bottom: 0;
-  margin-bottom: 0;
-}
-
-.app-footer-inner {
-  margin-inline: auto;
-  max-width: 42rem;
-  padding: 0.55rem 1rem calc(var(--app-dock-clearance) + 0.15rem);
-  text-align: center;
-}
-
-@media (min-width: 640px) {
-  .app-footer-inner {
-    padding-inline: 1.5rem;
   }
 }
 
@@ -301,15 +387,16 @@ body > * {
   max-width: 42rem;
   flex-direction: column;
   gap: 1.75rem;
-  /* Top safe-area for notch + status bar in standalone */
+  /* Top safe-area + bottom room for floating dock */
   padding: calc(1.15rem + var(--app-safe-top)) max(1rem, env(safe-area-inset-right, 0px))
-    0.75rem max(1rem, env(safe-area-inset-left, 0px));
+    calc(var(--app-dock-clearance) + 0.5rem) max(1rem, env(safe-area-inset-left, 0px));
 }
 
 @media (min-width: 640px) {
   .ui-shell {
     gap: 2.25rem;
-    padding: calc(2.25rem + var(--app-safe-top)) 1.5rem 1rem;
+    padding: calc(2.25rem + var(--app-safe-top)) 1.5rem
+      calc(var(--app-dock-clearance) + 0.75rem);
   }
 }
 
@@ -362,34 +449,148 @@ body > * {
   color: var(--color-muted);
 }
 
+/*
+  Text inputs + native selects — glass field with violet focus.
+  Use background-color / background-image separately (never `background`
+  shorthand on hover) so select chevrons don’t reset to repeat.
+*/
 .ui-field {
+  --field-sheen: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-surface) 35%, transparent),
+    transparent 55%
+  );
+  --field-fill: color-mix(in srgb, var(--color-canvas-soft) 88%, transparent);
   width: 100%;
-  border-radius: 1rem;
-  border: 1px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-canvas-soft) 85%, transparent);
-  padding: 0.625rem 0.875rem;
+  appearance: none;
+  -webkit-appearance: none;
+  border-radius: 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--color-border-strong) 90%, transparent);
+  background-color: var(--field-fill);
+  background-image: var(--field-sheen);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
+  padding: 0.7rem 0.9rem;
   font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
   color: var(--color-ink);
   outline: none;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.04) inset,
+    0 1px 2px rgb(0 0 0 / 0.12);
   transition:
-    border-color 0.15s,
-    background 0.15s,
-    box-shadow 0.15s;
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    background-image 0.15s ease,
+    box-shadow 0.15s ease,
+    color 0.15s ease;
 }
 
 /* Icon inside field — full padding shorthand on .ui-field would override Tailwind pl-* */
 .ui-field-with-icon {
-  padding-left: 2.5rem;
+  padding-left: 2.55rem;
 }
 
 .ui-field::placeholder {
   color: var(--color-faint);
+  font-weight: 450;
 }
 
-.ui-field:focus {
-  border-color: color-mix(in srgb, var(--color-accent) 50%, transparent);
-  background: var(--color-surface-2);
-  box-shadow: 0 0 0 3px var(--color-accent-ring);
+.ui-field:hover:not(:disabled):not(:focus) {
+  --field-sheen: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-surface-2) 40%, transparent),
+    transparent 55%
+  );
+  --field-fill: color-mix(in srgb, var(--color-canvas-soft) 92%, transparent);
+  border-color: color-mix(in srgb, var(--color-border-strong) 100%, white 8%);
+  background-color: var(--field-fill);
+  background-image: var(--field-sheen);
+}
+
+.ui-field:focus,
+.ui-field:focus-visible {
+  --field-sheen: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-surface-2) 45%, transparent),
+    transparent 60%
+  );
+  --field-fill: color-mix(in srgb, var(--color-surface-2) 92%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent) 55%, transparent);
+  background-color: var(--field-fill);
+  background-image: var(--field-sheen);
+  box-shadow:
+    0 0 0 3px var(--color-accent-ring),
+    0 1px 0 rgb(255 255 255 / 0.05) inset,
+    0 8px 20px -12px rgb(139 92 246 / 0.35);
+}
+
+.ui-field:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Native <select> — single chevron, never tiled */
+select.ui-field {
+  --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239c9689' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  cursor: pointer;
+  padding-right: 2.35rem;
+  background-color: var(--field-fill);
+  background-image: var(--field-sheen), var(--select-chevron);
+  background-repeat: no-repeat, no-repeat;
+  background-position:
+    0 0,
+    right 0.75rem center;
+  background-size:
+    100% 100%,
+    1rem 1rem;
+}
+
+select.ui-field:hover:not(:disabled):not(:focus) {
+  --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23d4cfc4' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-color: var(--field-fill);
+  background-image: var(--field-sheen), var(--select-chevron);
+  background-repeat: no-repeat, no-repeat;
+  background-position:
+    0 0,
+    right 0.75rem center;
+  background-size:
+    100% 100%,
+    1rem 1rem;
+}
+
+select.ui-field:focus,
+select.ui-field:focus-visible {
+  --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a78bfa' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-color: var(--field-fill);
+  background-image: var(--field-sheen), var(--select-chevron);
+  background-repeat: no-repeat, no-repeat;
+  background-position:
+    0 0,
+    right 0.75rem center;
+  background-size:
+    100% 100%,
+    1rem 1rem;
+}
+
+/* Search cancel button (WebKit) — less ugly */
+.ui-field[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 0.9rem;
+  width: 0.9rem;
+  margin-left: 0.35rem;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b665c' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M18 6 6 18M6 6l12 12'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+  cursor: pointer;
+  opacity: 0.85;
+}
+
+.ui-field[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
 }
 
 .ui-chip {
@@ -656,4 +857,13 @@ input[type="range"] {
 select option {
   background: var(--color-surface-2);
   color: var(--color-ink);
+}
+
+/* Compact select (inline controls e.g. pace) */
+.ui-field-sm {
+  width: auto;
+  min-width: 5.5rem;
+  padding: 0.4rem 2rem 0.4rem 0.65rem;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
 }

@@ -1,0 +1,80 @@
+# When Boardsesh publishes a newer Kilter snapshot, redeploy Vercel so the
+# build-time `ensure-boardsesh-db` downloads the new slim catalog.
+#
+# Setup (once):
+#   1. Vercel → Project → Settings → Git → Deploy Hooks → create hook for `main`
+#   2. GitHub → Settings → Secrets and variables → Actions:
+#        VERCEL_DEPLOY_HOOK_URL = (the hook URL)
+#
+# Compares remote manifest to committed `data/boardsesh/manifest-entry.json`.
+# Does NOT download the multi‑100MB DB in CI (that happens on Vercel build).
+
+name: Boardsesh catalog refresh
+
+on:
+  schedule:
+    # Every 6 hours (4× / day): 00:00, 06:00, 12:00, 18:00 UTC
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check-and-redeploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check Boardsesh snapshot
+        id: check
+        run: |
+          set +e
+          node scripts/sync-boardsesh.mjs --check-only
+          code=$?
+          set -e
+          if [ "$code" -eq 0 ]; then
+            echo "stale=false" >> "$GITHUB_OUTPUT"
+            echo "Catalog pin matches remote."
+          elif [ "$code" -eq 2 ]; then
+            echo "stale=true" >> "$GITHUB_OUTPUT"
+            echo "Remote snapshot is newer (or pin missing)."
+          else
+            echo "Boardsesh check failed with exit $code"
+            exit "$code"
+          fi
+
+      - name: Redeploy Vercel
+        if: steps.check.outputs.stale == 'true'
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::warning::VERCEL_DEPLOY_HOOK_URL secret not set — skip redeploy"
+            echo "Add Deploy Hook so production rebuilds with the new catalog."
+            exit 0
+          fi
+          echo "Triggering Vercel deploy hook…"
+          curl -fsS -X POST "$HOOK"
+          echo
+          echo "Deploy requested. Vercel build runs ensure-boardsesh (full slim sync)."
+
+      - name: Commit updated manifest pin
+        if: steps.check.outputs.stale == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/boardsesh/manifest.json data/boardsesh/manifest-entry.json
+          if git diff --staged --quiet; then
+            echo "No pin file changes to commit."
+            exit 0
+          fi
+          git commit -m "chore(boardsesh): bump snapshot pin to latest CDN builtAt"
+          git push

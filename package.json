@@ -1,13 +1,16 @@
 {
   "name": "kilterboard",
   "private": true,
-  "version": "1.1.0",
+  "version": "1.1.2",
   "scripts": {
+    "predev": "node scripts/ensure-boardsesh-db.mjs",
     "dev": "next dev",
     "build": "node scripts/ensure-boardsesh-db.mjs && next build",
     "start": "next start",
     "lint": "next lint",
     "sync:climbs": "node scripts/sync-boardsesh.mjs",
+    "sync:climbs:force": "node scripts/sync-boardsesh.mjs --force",
+    "sync:climbs:check": "node scripts/sync-boardsesh.mjs --check-only",
     "ensure:climbs": "node scripts/ensure-boardsesh-db.mjs",
     "train:boulder-ai": "node scripts/train-boulder-ai.mjs",
     "eval:boulder-ai": "node scripts/eval-boulder-ai.mjs",
@@ -18,16 +21,16 @@
   "dependencies": {
     "@hangtime/grip-connect": "^0.15.0",
     "@radix-ui/react-slider": "^1.4.7",
-    "next": "^15.3.3",
+    "next": "^16.3.0",
     "onnxruntime-web": "^1.20.1",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.10",
     "@types/node": "^22.15.30",
-    "@types/react": "^19.1.6",
-    "@types/react-dom": "^19.1.6",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "tailwindcss": "^4.1.10",
     "typescript": "^5.8.3"
   },

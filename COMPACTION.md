@@ -1,28 +1,70 @@
-# Compaction / resume — Kilterboard v1.0.0
+# Compaction / resume — Kilterboard v1.1.2
 
-## Product
+## How to use
 
-Kilter 12×12 web app: Boardsesh catalog, Set editor, Aurora BLE, **Hold AR** local ONNX generator.  
-UI English only. Version footer **v1.0.0** (`lib/version.ts`).
+1. Paste the **Resume block** below into a new agent session (or after `/compact`).
+2. Point at repo: `~/Documents/reps.nosync/kilterboard`
+3. Read on demand: `COPILOT.md` → `PROGRESS.md` → `ARCHITECTURE.md` / `AI.md`
+4. Do **not** dump DB/ONNX into chat.
 
-## AI (current)
+## Resume block (paste this)
 
-- Generator: **hold-ar only** (causal Transformer → ONNX → `hold-ar-worker.js`)
-- No remix/freq/cooccur/spatial in product UI
-- Playground: gen + paint; no Approve/tags UI
-- Train: `ml/hold-ar/train.py` · export: `npm run ml:export-onnx`
-- Best val_acc ~19.9% top-5 ~44.8% (next-token); free-run still uses mask + polish
+```
+Kilterboard — Next.js 16 App Router, React 19, Tailwind 4, Node ≥22 (node:sqlite).
+Path: ~/Documents/reps.nosync/kilterboard
+GitHub: https://github.com/mihailo1/kilterboard (main)
+Version: 1.1.2 (lib/version.ts + package.json) — AppBrand chip, not footer.
+
+Product
+- Kilter 12×12 + kickboard: Boardsesh catalog, Set studio, Aurora BLE, local Hold AR
+- UI English only; chat with user in Russian when they write Russian
+- PWA: standalone manifest, glass bottom dock (Climbs / Set / Hold AR), InstallPrompt
+- No site footer; brand = orb logo + title + v1.1.2 (AppBrand)
+- Logo: pure violet radial sphere; glow via filter drop-shadow
+
+AI
+- Hold AR only: public/ai/boulder/hold-ar-worker.js + hold-ar-v1.onnx (~33MB)
+- lib/ai/boulder-ai.ts bridge; playground has BLE Connect
+- No remix / Approve-tags in UI
+- Train: ml/hold-ar · npm run ml:export-onnx
+
+Catalog / auto-update (v1.1.2)
+- DB gitignored: data/boardsesh/kilter-12x12.db (+ .gz ~37MB slim)
+- Stale-aware sync: npm run sync:climbs (skip if builtAt matches CDN)
+- Local: predev → ensure-boardsesh-db
+- Vercel build: ensure downloads latest if missing/stale on build machine
+- GitHub Action boardsesh-refresh.yml every 6h → Deploy Hook if pin stale
+- Secret: VERCEL_DEPLOY_HOOK_URL (set once in GitHub Actions)
+- /api/climbs 503 if DB missing
+
+List filters
+- URL query + sessionStorage kb:climb-list-qs; climb links from=; BackToClimbs
+
+Commands
+nvm use 22 && npm install && npm run sync:climbs && npm run dev
+
+Docs: README · ARCHITECTURE · AI.md · COPILOT · PROGRESS · COMPACTION
+Scope: only this repo. Prefer small diffs; update .md after meaningful changes.
+```
+
+## Snapshot table
+
+| Item | Value |
+|------|--------|
+| Version | **1.1.2** |
+| Framework | Next **16.3** / React 19 |
+| AI product | Hold AR ONNX only |
+| Nav | Bottom dock; AppBrand version chip |
+| Climb back | `from` + sessionStorage |
+| Boardsesh | stale-aware sync; ensure on predev/build; GH Action 4×/day |
+| Deploy hook | `VERCEL_DEPLOY_HOOK_URL` secret |
 
 ## Commands
 
 ```bash
-nvm use 22 && npm install && npm run sync:climbs && npm run dev
+cd ~/Documents/reps.nosync/kilterboard
+nvm use 22
+npm install
+npm run sync:climbs   # no-op if already current
+npm run dev           # predev ensures catalog
 ```
-
-## Docs
-
-README · ARCHITECTURE · AI.md · COPILOT · PROGRESS · docs/AI-PLAN-B-STRUCTURED.md
-
-## Scope
-
-Only `~/Documents/reps.nosync/kilterboard`. Do not dump DB/models into chat.

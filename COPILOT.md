@@ -7,7 +7,7 @@ Agent / Copilot instructions for this repo.
 - **Chat with this user:** prefer Russian when they write in Russian
 - **Docs:** English (README, ARCHITECTURE, COPILOT); `AI.md` may be bilingual
 
-**Version:** `lib/version.ts` → `APP_VERSION` (currently **1.0.0**). Keep in sync with `package.json`.
+**Version:** `lib/version.ts` → `APP_VERSION` (currently **1.1.2**). Keep in sync with `package.json`.
 
 ## Project
 
@@ -19,7 +19,7 @@ Path: `~/Documents/reps.nosync/kilterboard`
 
 | Layer | Choice |
 |-------|--------|
-| Framework | Next.js 15 App Router, React 19, TypeScript |
+| Framework | Next.js 16 App Router, React 19, TypeScript |
 | Styles | Tailwind CSS 4 — warm dark + violet accent |
 | Climb DB | Local SQLite (`node:sqlite`) from Boardsesh CDN |
 | Board layout | BoardLib-style JSON (`data/kilter/*`) |
@@ -32,7 +32,9 @@ Path: `~/Documents/reps.nosync/kilterboard`
 ```bash
 nvm use 22
 npm install
-npm run sync:climbs          # Boardsesh DB
+npm run sync:climbs          # Boardsesh DB (stale-aware)
+npm run sync:climbs:force    # always rebuild slim DB
+npm run ensure:climbs        # same as predev / build gate
 npm run train:boulder-ai     # rebuild models.json (coords/rules pack)
 npm run ml:export-sequences  # Plan B dataset for train
 # Python: ml/hold-ar train + export_onnx
@@ -45,9 +47,10 @@ npm run build
 
 1. Layout: Kilter original, size **10** (12×12 + kickboard)
 2. List filters: all angles default; grades Font/V via difficulty 10–33
-3. BLE: Chrome/Edge or Android Chrome only — **no Safari/iOS**
-4. AI: **Hold AR only** (local ONNX). No remix in product UI.
-5. Playground: gen + paint; no feedback labels UI
+3. **List filter persistence:** URL query on `/` + `sessionStorage` key `kb:climb-list-qs`. Climb detail links include `from=<list qs>`; “All climbs” uses `BackToClimbs` (`lib/climb-list-url.ts`)
+4. BLE: Chrome/Edge or Android Chrome only — **no Safari/iOS**
+5. AI: **Hold AR only** (local ONNX). No remix in product UI.
+6. Playground: gen + paint; no feedback labels UI
 
 ## Layout map
 

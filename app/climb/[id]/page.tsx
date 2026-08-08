@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { BackToClimbs } from '@/components/BackToClimbs'
 import { FramePlayer } from '@/components/FramePlayer'
 import { getBoardMeta, frameCount } from '@/lib/aurora/board'
 import { getClimbById } from '@/lib/climbs'
@@ -56,12 +56,12 @@ export default async function ClimbPage({ params, searchParams }: PageProps) {
   const frames = climb.frames ?? ''
   const nFrames = frameCount(frames)
 
+  const from = first(sp.from)
+
   return (
     <main className="ui-shell">
       <div>
-        <Link href="/" className="ui-link inline-flex items-center gap-1.5 text-sm">
-          <span aria-hidden>←</span> All climbs
-        </Link>
+        <BackToClimbs from={from} />
       </div>
 
       <header className="app-header space-y-3">

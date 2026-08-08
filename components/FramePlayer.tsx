@@ -140,7 +140,7 @@ export function FramePlayer({
                 <select
                   value={paceMs}
                   onChange={(e) => setPaceMs(Number(e.target.value))}
-                  className="rounded-xl border border-border bg-surface-2 px-2 py-1 text-xs text-ink"
+                  className="ui-field ui-field-sm"
                 >
                   {PACE_OPTIONS.map((p) => (
                     <option key={p.ms} value={p.ms}>

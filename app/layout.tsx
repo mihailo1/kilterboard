@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { DM_Sans, Fraunces } from 'next/font/google'
 import { AppBottomNav } from '@/components/AppBottomNav'
-import { AppFooter } from '@/components/AppFooter'
 import { InstallPrompt } from '@/components/InstallPrompt'
 import { APP_NAME, APP_VERSION } from '@/lib/version'
 import './globals.css'
@@ -69,7 +68,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`h-full ${body.variable} ${display.variable}`}>
       <body className="app-body flex min-h-dvh flex-col font-sans antialiased">
         <div className="app-main flex min-h-0 w-full flex-1 flex-col">{children}</div>
-        <AppFooter />
         <AppBottomNav />
         <InstallPrompt />
         <span className="sr-only">

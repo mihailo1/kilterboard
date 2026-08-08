@@ -1,4 +1,4 @@
-# Architecture — Kilterboard v1.0.0
+# Architecture — Kilterboard v1.1.2
 
 How the app is put together: data flow, layers, and constraints.  
 Agent rules: `COPILOT.md`. Local AI: **`AI.md`**.
@@ -54,10 +54,14 @@ flowchart TB
 
 | Step | Detail |
 |------|--------|
-| Source | Daily SQLite from Boardsesh CDN (Kilter layout **1**) |
+| Source | Boardsesh CDN snapshots (Kilter layout **1**) |
 | Filter | listed, not draft, size **10** |
-| Local | `data/boardsesh/kilter-12x12.db` (gitignored) |
+| Local | `data/boardsesh/kilter-12x12.db` + `.gz` (gitignored) |
+| Pin | committed `manifest-entry.json` / `manifest.json` (`builtAt`) |
 | Fast path | Denormalized **`search_rows`** |
+| Sync | `sync-boardsesh.mjs` stale-aware (`builtAt`); `--force` / `--check-only` |
+| Local auto | `predev` → `ensure-boardsesh-db.mjs` |
+| Prod auto | build ensure + GH Action **every 6h** → Vercel Deploy Hook if pin stale |
 
 ### 2. HTTP API
 
@@ -67,6 +71,13 @@ flowchart TB
 | `GET /api/setters?q=` | Setter autocomplete |
 
 Runtime: **Node only** (`node:sqlite`). Grades: difficulty 10–33 → Font/V.
+
+### 2b. Climb list filter state
+
+- **URL on `/`:** non-default filters as query (`name`, `setter`, `angle`, `sort`, `kind`, …) via `ClimbList` `router.replace`
+- **sessionStorage** `kb:climb-list-qs` — same string, backup for “All climbs”
+- **Climb detail:** `buildClimbHref(climb, listQs)` adds `from=<list qs>`; `BackToClimbs` → `/?…` so filters survive detail navigation
+- Helpers: `lib/climb-list-url.ts`
 
 ### 3. Frames & board
 

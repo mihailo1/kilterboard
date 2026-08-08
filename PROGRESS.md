@@ -15,6 +15,23 @@
 
 ---
 
+## 2026-08-09 — v1.1.2 auto Boardsesh catalog
+
+- **Stale-aware** `sync-boardsesh.mjs`: compare CDN `builtAt` to local `meta` / `manifest-entry.json`; skip download when current
+- Flags: `--force`, `--check-only` (exit 0 fresh / 2 stale)
+- `ensure-boardsesh-db.mjs`: always stale-aware; offline-local keeps cache; Vercel/CI requires success
+- `predev` + `build` run ensure; scripts `sync:climbs:force`, `sync:climbs:check`
+- GitHub Action `.github/workflows/boardsesh-refresh.yml` — **every 6h** (4×/day) + `workflow_dispatch`; if pin stale → `VERCEL_DEPLOY_HOOK_URL` + commit pin files
+- No always-on backend (serverless cannot own mutable SQLite); redeploy = fresh catalog on build
+- Secret once: Vercel Deploy Hook → GitHub Actions secret `VERCEL_DEPLOY_HOOK_URL`
+
+## 2026-08-07 — Preserve climb list filters on back
+
+- **Bug:** `/climb/:id` “All climbs” was always `href="/"` → search/filters lost
+- **Fix:** list query synced to URL + `sessionStorage` (`kb:climb-list-qs`); climb links carry `from=<list qs>`; `BackToClimbs` restores `/?…`
+- Helpers: `lib/climb-list-url.ts`
+- **v1.1.1** (shipped with 1.1.2)
+
 ## 2026-08-06 — Prod 503 /api/climbs (Vercel)
 
 - **Cause:** `data/boardsesh/*.db` gitignored → no catalog on deploy → API returned 503

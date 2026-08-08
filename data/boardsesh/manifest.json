@@ -1,1 +1,490 @@
-{"formatVersion":1,"generatedAt":"2026-07-30T09:42:20.310Z","entries":[{"boardType":"decoy","layoutId":1,"key":"board-snapshots/v1/decoy/1/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/decoy/1/2026-07-30T09-41-05-326Z.db","bytes":81920,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":101,"watermarkUpdatedAt":"2026-07-29T22:15:31.131386Z","watermarkSyncSeq":"1036508"},"board_climb_stats":{"rowCount":82,"watermarkUpdatedAt":"2026-07-29T22:15:31.131386Z","watermarkSyncSeq":"135050294"}}},{"boardType":"decoy","layoutId":2,"key":"board-snapshots/v1/decoy/2/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/decoy/2/2026-07-30T09-41-05-326Z.db","bytes":5963776,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":8869,"watermarkUpdatedAt":"2026-07-30T07:37:01.734393Z","watermarkSyncSeq":"1038200"},"board_climb_stats":{"rowCount":10918,"watermarkUpdatedAt":"2026-07-30T07:37:01.734393Z","watermarkSyncSeq":"138956996"}}},{"boardType":"grasshopper","layoutId":1,"key":"board-snapshots/v1/grasshopper/1/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/grasshopper/1/2026-07-30T09-41-05-326Z.db","bytes":16728064,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":23412,"watermarkUpdatedAt":"2026-07-29T22:50:46.717886Z","watermarkSyncSeq":"1036568"},"board_climb_stats":{"rowCount":29337,"watermarkUpdatedAt":"2026-07-30T05:06:27.584421Z","watermarkSyncSeq":"137380220"}}},{"boardType":"kilter","layoutId":1,"key":"board-snapshots/v1/kilter/1/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/1/2026-07-30T09-41-05-326Z.db","bytes":271314944,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":373046,"watermarkUpdatedAt":"2026-07-30T09:13:20.168384Z","watermarkSyncSeq":"1038532"},"board_climb_stats":{"rowCount":355145,"watermarkUpdatedAt":"2026-07-30T09:26:58.560373Z","watermarkSyncSeq":"139730062"}}},{"boardType":"kilter","layoutId":2,"key":"board-snapshots/v1/kilter/2/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/2/2026-07-30T09-41-05-326Z.db","bytes":139264,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":160,"watermarkUpdatedAt":"2026-07-08T09:22:10.006519Z","watermarkSyncSeq":"881238"},"board_climb_stats":{"rowCount":154,"watermarkUpdatedAt":"2026-07-30T08:21:37.359252Z","watermarkSyncSeq":"139632080"}}},{"boardType":"kilter","layoutId":3,"key":"board-snapshots/v1/kilter/3/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/3/2026-07-30T09-41-05-326Z.db","bytes":40960,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":2,"watermarkUpdatedAt":"2026-07-07T02:11:45.949735Z","watermarkSyncSeq":"86968"},"board_climb_stats":{"rowCount":0,"watermarkUpdatedAt":"1970-01-01T00:00:00.000Z","watermarkSyncSeq":"0"}}},{"boardType":"kilter","layoutId":5,"key":"board-snapshots/v1/kilter/5/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/5/2026-07-30T09-41-05-326Z.db","bytes":417792,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":637,"watermarkUpdatedAt":"2026-07-08T10:07:56.201781Z","watermarkSyncSeq":"883924"},"board_climb_stats":{"rowCount":462,"watermarkUpdatedAt":"2026-07-08T10:32:58.506776Z","watermarkSyncSeq":"5642374"}}},{"boardType":"kilter","layoutId":6,"key":"board-snapshots/v1/kilter/6/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/6/2026-07-30T09-41-05-326Z.db","bytes":40960,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":6,"watermarkUpdatedAt":"2026-07-08T09:22:10.006519Z","watermarkSyncSeq":"876687"},"board_climb_stats":{"rowCount":2,"watermarkUpdatedAt":"2026-07-08T10:32:58.506776Z","watermarkSyncSeq":"5414888"}}},{"boardType":"kilter","layoutId":7,"key":"board-snapshots/v1/kilter/7/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/7/2026-07-30T09-41-05-326Z.db","bytes":49152,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":12,"watermarkUpdatedAt":"2026-07-08T09:22:10.006519Z","watermarkSyncSeq":"881110"},"board_climb_stats":{"rowCount":11,"watermarkUpdatedAt":"2026-07-08T10:32:58.506776Z","watermarkSyncSeq":"5631211"}}},{"boardType":"kilter","layoutId":8,"key":"board-snapshots/v1/kilter/8/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/8/2026-07-30T09-41-05-326Z.db","bytes":29474816,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":34059,"watermarkUpdatedAt":"2026-07-30T09:13:20.168384Z","watermarkSyncSeq":"1038528"},"board_climb_stats":{"rowCount":50124,"watermarkUpdatedAt":"2026-07-30T08:23:23.818113Z","watermarkSyncSeq":"139729862"}}},{"boardType":"moonboard","layoutId":1,"key":"board-snapshots/v1/moonboard/1/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/moonboard/1/2026-07-30T09-41-05-326Z.db","bytes":114688,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":125,"watermarkUpdatedAt":"2026-07-08T09:22:10.006519Z","watermarkSyncSeq":"883573"},"board_climb_stats":{"rowCount":125,"watermarkUpdatedAt":"2026-07-08T10:32:58.506776Z","watermarkSyncSeq":"5863253"}}},{"boardType":"moonboard","layoutId":2,"key":"board-snapshots/v1/moonboard/2/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/moonboard/2/2026-07-30T09-41-05-326Z.db","bytes":55083008,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":93935,"watermarkUpdatedAt":"2026-07-27T23:24:43.470989Z","watermarkSyncSeq":"1030072"},"board_climb_stats":{"rowCount":93915,"watermarkUpdatedAt":"2026-07-30T09:33:09.677602Z","watermarkSyncSeq":"139730499"}}},{"boardType":"moonboard","layoutId":3,"key":"board-snapshots/v1/moonboard/3/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/moonboard/3/2026-07-30T09-41-05-326Z.db","bytes":24793088,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":40715,"watermarkUpdatedAt":"2026-07-27T13:27:10.120462Z","watermarkSyncSeq":"1028988"},"board_climb_stats":{"rowCount":40716,"watermarkUpdatedAt":"2026-07-30T09:17:56.143245Z","watermarkSyncSeq":"139729929"}}},{"boardType":"moonboard","layoutId":4,"key":"board-snapshots/v1/moonboard/4/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/moonboard/4/2026-07-30T09-41-05-326Z.db","bytes":44589056,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":75098,"watermarkUpdatedAt":"2026-07-25T22:33:18.449186Z","watermarkSyncSeq":"1023322"},"board_climb_stats":{"rowCount":75096,"watermarkUpdatedAt":"2026-07-30T00:19:20.568823Z","watermarkSyncSeq":"135828464"}}},{"boardType":"moonboard","layoutId":5,"key":"board-snapshots/v1/moonboard/5/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/moonboard/5/2026-07-30T09-41-05-326Z.db","bytes":35627008,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":58644,"watermarkUpdatedAt":"2026-07-16T20:59:08.725882Z","watermarkSyncSeq":"916977"},"board_climb_stats":{"rowCount":58684,"watermarkUpdatedAt":"2026-07-30T08:44:46.249224Z","watermarkSyncSeq":"139729886"}}},{"boardType":"moonboard","layoutId":6,"key":"board-snapshots/v1/moonboard/6/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/moonboard/6/2026-07-30T09-41-05-326Z.db","bytes":4640768,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":7877,"watermarkUpdatedAt":"2026-07-08T09:22:10.006519Z","watermarkSyncSeq":"883834"},"board_climb_stats":{"rowCount":7927,"watermarkUpdatedAt":"2026-07-30T09:00:41.668708Z","watermarkSyncSeq":"139729914"}}},{"boardType":"moonboard","layoutId":7,"key":"board-snapshots/v1/moonboard/7/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/moonboard/7/2026-07-30T09-41-05-326Z.db","bytes":3047424,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":4889,"watermarkUpdatedAt":"2026-07-08T09:22:10.006519Z","watermarkSyncSeq":"883821"},"board_climb_stats":{"rowCount":4890,"watermarkUpdatedAt":"2026-07-28T22:58:24.219974Z","watermarkSyncSeq":"129625934"}}},{"boardType":"soill","layoutId":1,"key":"board-snapshots/v1/soill/1/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/soill/1/2026-07-30T09-41-05-326Z.db","bytes":1261568,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":2102,"watermarkUpdatedAt":"2026-07-29T05:27:51.02462Z","watermarkSyncSeq":"1034500"},"board_climb_stats":{"rowCount":1967,"watermarkUpdatedAt":"2026-07-29T05:27:51.02462Z","watermarkSyncSeq":"131951322"}}},{"boardType":"tension","layoutId":9,"key":"board-snapshots/v1/tension/9/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/tension/9/2026-07-30T09-41-05-326Z.db","bytes":47218688,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":71759,"watermarkUpdatedAt":"2026-07-30T01:08:37.237614Z","watermarkSyncSeq":"1037011"},"board_climb_stats":{"rowCount":78868,"watermarkUpdatedAt":"2026-07-30T09:29:45.302607Z","watermarkSyncSeq":"139730451"}}},{"boardType":"tension","layoutId":10,"key":"board-snapshots/v1/tension/10/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/tension/10/2026-07-30T09-41-05-326Z.db","bytes":34230272,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":52735,"watermarkUpdatedAt":"2026-07-30T09:29:45.302607Z","watermarkSyncSeq":"1038549"},"board_climb_stats":{"rowCount":54956,"watermarkUpdatedAt":"2026-07-30T09:29:45.302607Z","watermarkSyncSeq":"139730495"}}},{"boardType":"tension","layoutId":11,"key":"board-snapshots/v1/tension/11/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/tension/11/2026-07-30T09-41-05-326Z.db","bytes":20103168,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":28801,"watermarkUpdatedAt":"2026-07-30T09:29:45.302607Z","watermarkSyncSeq":"1038548"},"board_climb_stats":{"rowCount":35341,"watermarkUpdatedAt":"2026-07-30T09:29:45.302607Z","watermarkSyncSeq":"139730497"}}},{"boardType":"touchstone","layoutId":1,"key":"board-snapshots/v1/touchstone/1/2026-07-30T09-41-05-326Z.db","url":"https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/touchstone/1/2026-07-30T09-41-05-326Z.db","bytes":929792,"contentEncoding":"identity","builtAt":"2026-07-30T09:41:05.326Z","schemaVersion":4,"tables":{"board_climbs":{"rowCount":1528,"watermarkUpdatedAt":"2026-07-07T02:11:45.949735Z","watermarkSyncSeq":"789722"},"board_climb_stats":{"rowCount":1189,"watermarkUpdatedAt":"2026-07-29T04:40:23.967526Z","watermarkSyncSeq":"131950929"}}}]}
+{
+  "formatVersion": 1,
+  "generatedAt": "2026-08-08T08:00:34.205Z",
+  "entries": [
+    {
+      "boardType": "decoy",
+      "layoutId": 1,
+      "key": "board-snapshots/v1/decoy/1/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/decoy/1/2026-08-08T07-59-16-253Z.db",
+      "bytes": 81920,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 101,
+          "watermarkUpdatedAt": "2026-07-29T22:15:31.131386Z",
+          "watermarkSyncSeq": "1036508"
+        },
+        "board_climb_stats": {
+          "rowCount": 82,
+          "watermarkUpdatedAt": "2026-07-29T22:15:31.131386Z",
+          "watermarkSyncSeq": "135050294"
+        }
+      }
+    },
+    {
+      "boardType": "decoy",
+      "layoutId": 2,
+      "key": "board-snapshots/v1/decoy/2/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/decoy/2/2026-08-08T07-59-16-253Z.db",
+      "bytes": 6012928,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 8926,
+          "watermarkUpdatedAt": "2026-08-08T00:23:19.361937Z",
+          "watermarkSyncSeq": "1066446"
+        },
+        "board_climb_stats": {
+          "rowCount": 11011,
+          "watermarkUpdatedAt": "2026-08-08T05:01:36.07574Z",
+          "watermarkSyncSeq": "194125187"
+        }
+      }
+    },
+    {
+      "boardType": "grasshopper",
+      "layoutId": 1,
+      "key": "board-snapshots/v1/grasshopper/1/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/grasshopper/1/2026-08-08T07-59-16-253Z.db",
+      "bytes": 16719872,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 23479,
+          "watermarkUpdatedAt": "2026-08-08T02:44:05.066495Z",
+          "watermarkSyncSeq": "1066866"
+        },
+        "board_climb_stats": {
+          "rowCount": 29421,
+          "watermarkUpdatedAt": "2026-08-08T02:44:05.066495Z",
+          "watermarkSyncSeq": "192571736"
+        }
+      }
+    },
+    {
+      "boardType": "kilter",
+      "layoutId": 1,
+      "key": "board-snapshots/v1/kilter/1/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/1/2026-08-08T07-59-16-253Z.db",
+      "bytes": 272769024,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 374520,
+          "watermarkUpdatedAt": "2026-08-08T07:11:43.733291Z",
+          "watermarkSyncSeq": "1067608"
+        },
+        "board_climb_stats": {
+          "rowCount": 356977,
+          "watermarkUpdatedAt": "2026-08-08T07:42:22.209013Z",
+          "watermarkSyncSeq": "194905991"
+        }
+      }
+    },
+    {
+      "boardType": "kilter",
+      "layoutId": 2,
+      "key": "board-snapshots/v1/kilter/2/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/2/2026-08-08T07-59-16-253Z.db",
+      "bytes": 139264,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 160,
+          "watermarkUpdatedAt": "2026-07-08T09:22:10.006519Z",
+          "watermarkSyncSeq": "881238"
+        },
+        "board_climb_stats": {
+          "rowCount": 154,
+          "watermarkUpdatedAt": "2026-08-08T06:19:24.571398Z",
+          "watermarkSyncSeq": "194804853"
+        }
+      }
+    },
+    {
+      "boardType": "kilter",
+      "layoutId": 3,
+      "key": "board-snapshots/v1/kilter/3/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/3/2026-08-08T07-59-16-253Z.db",
+      "bytes": 40960,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 2,
+          "watermarkUpdatedAt": "2026-07-07T02:11:45.949735Z",
+          "watermarkSyncSeq": "86968"
+        },
+        "board_climb_stats": {
+          "rowCount": 0,
+          "watermarkUpdatedAt": "1970-01-01T00:00:00.000Z",
+          "watermarkSyncSeq": "0"
+        }
+      }
+    },
+    {
+      "boardType": "kilter",
+      "layoutId": 5,
+      "key": "board-snapshots/v1/kilter/5/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/5/2026-08-08T07-59-16-253Z.db",
+      "bytes": 417792,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 637,
+          "watermarkUpdatedAt": "2026-07-08T10:07:56.201781Z",
+          "watermarkSyncSeq": "883924"
+        },
+        "board_climb_stats": {
+          "rowCount": 462,
+          "watermarkUpdatedAt": "2026-07-08T10:32:58.506776Z",
+          "watermarkSyncSeq": "5642374"
+        }
+      }
+    },
+    {
+      "boardType": "kilter",
+      "layoutId": 6,
+      "key": "board-snapshots/v1/kilter/6/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/6/2026-08-08T07-59-16-253Z.db",
+      "bytes": 40960,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 6,
+          "watermarkUpdatedAt": "2026-07-08T09:22:10.006519Z",
+          "watermarkSyncSeq": "876687"
+        },
+        "board_climb_stats": {
+          "rowCount": 2,
+          "watermarkUpdatedAt": "2026-07-08T10:32:58.506776Z",
+          "watermarkSyncSeq": "5414888"
+        }
+      }
+    },
+    {
+      "boardType": "kilter",
+      "layoutId": 7,
+      "key": "board-snapshots/v1/kilter/7/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/7/2026-08-08T07-59-16-253Z.db",
+      "bytes": 49152,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 12,
+          "watermarkUpdatedAt": "2026-07-08T09:22:10.006519Z",
+          "watermarkSyncSeq": "881110"
+        },
+        "board_climb_stats": {
+          "rowCount": 11,
+          "watermarkUpdatedAt": "2026-07-08T10:32:58.506776Z",
+          "watermarkSyncSeq": "5631211"
+        }
+      }
+    },
+    {
+      "boardType": "kilter",
+      "layoutId": 8,
+      "key": "board-snapshots/v1/kilter/8/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/8/2026-08-08T07-59-16-253Z.db",
+      "bytes": 29585408,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 34188,
+          "watermarkUpdatedAt": "2026-08-08T07:11:43.733291Z",
+          "watermarkSyncSeq": "1067604"
+        },
+        "board_climb_stats": {
+          "rowCount": 50293,
+          "watermarkUpdatedAt": "2026-08-08T06:21:15.676107Z",
+          "watermarkSyncSeq": "194902933"
+        }
+      }
+    },
+    {
+      "boardType": "moonboard",
+      "layoutId": 1,
+      "key": "board-snapshots/v1/moonboard/1/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/moonboard/1/2026-08-08T07-59-16-253Z.db",
+      "bytes": 114688,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 125,
+          "watermarkUpdatedAt": "2026-07-08T09:22:10.006519Z",
+          "watermarkSyncSeq": "883573"
+        },
+        "board_climb_stats": {
+          "rowCount": 125,
+          "watermarkUpdatedAt": "2026-07-08T10:32:58.506776Z",
+          "watermarkSyncSeq": "5863253"
+        }
+      }
+    },
+    {
+      "boardType": "moonboard",
+      "layoutId": 2,
+      "key": "board-snapshots/v1/moonboard/2/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/moonboard/2/2026-08-08T07-59-16-253Z.db",
+      "bytes": 55046144,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 93936,
+          "watermarkUpdatedAt": "2026-07-31T18:14:24.499496Z",
+          "watermarkSyncSeq": "1042146"
+        },
+        "board_climb_stats": {
+          "rowCount": 93916,
+          "watermarkUpdatedAt": "2026-08-08T07:54:01.464251Z",
+          "watermarkSyncSeq": "194906054"
+        }
+      }
+    },
+    {
+      "boardType": "moonboard",
+      "layoutId": 3,
+      "key": "board-snapshots/v1/moonboard/3/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/moonboard/3/2026-08-08T07-59-16-253Z.db",
+      "bytes": 24797184,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 40716,
+          "watermarkUpdatedAt": "2026-08-07T10:30:23.753331Z",
+          "watermarkSyncSeq": "1064969"
+        },
+        "board_climb_stats": {
+          "rowCount": 40717,
+          "watermarkUpdatedAt": "2026-08-07T10:27:51.783238Z",
+          "watermarkSyncSeq": "190230930"
+        }
+      }
+    },
+    {
+      "boardType": "moonboard",
+      "layoutId": 4,
+      "key": "board-snapshots/v1/moonboard/4/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/moonboard/4/2026-08-08T07-59-16-253Z.db",
+      "bytes": 44482560,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 75098,
+          "watermarkUpdatedAt": "2026-07-25T22:33:18.449186Z",
+          "watermarkSyncSeq": "1023322"
+        },
+        "board_climb_stats": {
+          "rowCount": 75101,
+          "watermarkUpdatedAt": "2026-08-05T20:10:03.775428Z",
+          "watermarkSyncSeq": "177749893"
+        }
+      }
+    },
+    {
+      "boardType": "moonboard",
+      "layoutId": 5,
+      "key": "board-snapshots/v1/moonboard/5/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/moonboard/5/2026-08-08T07-59-16-253Z.db",
+      "bytes": 35659776,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 58645,
+          "watermarkUpdatedAt": "2026-08-08T05:08:37.879747Z",
+          "watermarkSyncSeq": "1067246"
+        },
+        "board_climb_stats": {
+          "rowCount": 58684,
+          "watermarkUpdatedAt": "2026-08-08T04:26:23.627485Z",
+          "watermarkSyncSeq": "193349037"
+        }
+      }
+    },
+    {
+      "boardType": "moonboard",
+      "layoutId": 6,
+      "key": "board-snapshots/v1/moonboard/6/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/moonboard/6/2026-08-08T07-59-16-253Z.db",
+      "bytes": 4640768,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 7877,
+          "watermarkUpdatedAt": "2026-07-08T09:22:10.006519Z",
+          "watermarkSyncSeq": "883834"
+        },
+        "board_climb_stats": {
+          "rowCount": 7927,
+          "watermarkUpdatedAt": "2026-08-07T20:35:19.938876Z",
+          "watermarkSyncSeq": "190232139"
+        }
+      }
+    },
+    {
+      "boardType": "moonboard",
+      "layoutId": 7,
+      "key": "board-snapshots/v1/moonboard/7/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/moonboard/7/2026-08-08T07-59-16-253Z.db",
+      "bytes": 3047424,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 4889,
+          "watermarkUpdatedAt": "2026-07-08T09:22:10.006519Z",
+          "watermarkSyncSeq": "883821"
+        },
+        "board_climb_stats": {
+          "rowCount": 4890,
+          "watermarkUpdatedAt": "2026-08-08T04:32:25.25506Z",
+          "watermarkSyncSeq": "193577060"
+        }
+      }
+    },
+    {
+      "boardType": "soill",
+      "layoutId": 1,
+      "key": "board-snapshots/v1/soill/1/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/soill/1/2026-08-08T07-59-16-253Z.db",
+      "bytes": 1282048,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 2133,
+          "watermarkUpdatedAt": "2026-08-07T02:04:13.366518Z",
+          "watermarkSyncSeq": "1063445"
+        },
+        "board_climb_stats": {
+          "rowCount": 1992,
+          "watermarkUpdatedAt": "2026-08-07T02:04:13.366518Z",
+          "watermarkSyncSeq": "187118156"
+        }
+      }
+    },
+    {
+      "boardType": "tension",
+      "layoutId": 9,
+      "key": "board-snapshots/v1/tension/9/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/tension/9/2026-08-08T07-59-16-253Z.db",
+      "bytes": 47460352,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 72020,
+          "watermarkUpdatedAt": "2026-08-08T06:35:37.269136Z",
+          "watermarkSyncSeq": "1067449"
+        },
+        "board_climb_stats": {
+          "rowCount": 78985,
+          "watermarkUpdatedAt": "2026-08-08T07:56:26.236153Z",
+          "watermarkSyncSeq": "194906227"
+        }
+      }
+    },
+    {
+      "boardType": "tension",
+      "layoutId": 10,
+      "key": "board-snapshots/v1/tension/10/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/tension/10/2026-08-08T07-59-16-253Z.db",
+      "bytes": 34541568,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 53406,
+          "watermarkUpdatedAt": "2026-08-08T07:56:26.236153Z",
+          "watermarkSyncSeq": "1067617"
+        },
+        "board_climb_stats": {
+          "rowCount": 55382,
+          "watermarkUpdatedAt": "2026-08-08T07:56:26.236153Z",
+          "watermarkSyncSeq": "194906235"
+        }
+      }
+    },
+    {
+      "boardType": "tension",
+      "layoutId": 11,
+      "key": "board-snapshots/v1/tension/11/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/tension/11/2026-08-08T07-59-16-253Z.db",
+      "bytes": 20402176,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 29318,
+          "watermarkUpdatedAt": "2026-08-08T06:35:37.269136Z",
+          "watermarkSyncSeq": "1067451"
+        },
+        "board_climb_stats": {
+          "rowCount": 35849,
+          "watermarkUpdatedAt": "2026-08-08T07:56:26.236153Z",
+          "watermarkSyncSeq": "194906233"
+        }
+      }
+    },
+    {
+      "boardType": "touchstone",
+      "layoutId": 1,
+      "key": "board-snapshots/v1/touchstone/1/2026-08-08T07-59-16-253Z.db",
+      "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/touchstone/1/2026-08-08T07-59-16-253Z.db",
+      "bytes": 929792,
+      "contentEncoding": "identity",
+      "builtAt": "2026-08-08T07:59:16.253Z",
+      "schemaVersion": 4,
+      "tables": {
+        "board_climbs": {
+          "rowCount": 1528,
+          "watermarkUpdatedAt": "2026-07-07T02:11:45.949735Z",
+          "watermarkSyncSeq": "789722"
+        },
+        "board_climb_stats": {
+          "rowCount": 1192,
+          "watermarkUpdatedAt": "2026-08-07T03:28:28.686807Z",
+          "watermarkSyncSeq": "187120385"
+        }
+      }
+    }
+  ]
+}
