@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import {
+  listBackLabel,
   listHrefFromQuery,
   readStoredListQuery,
   writeStoredListQuery,
@@ -13,23 +14,28 @@ interface BackToClimbsProps {
   from?: string | null
 }
 
-/** “All climbs” — restores prior list filters via `from` or sessionStorage. */
+/** Back to list — restores prior filters via `from` or sessionStorage. */
 export function BackToClimbs({ from }: BackToClimbsProps) {
   const [href, setHref] = useState(() => listHrefFromQuery(from))
+  const [label, setLabel] = useState(() => listBackLabel(from))
 
   useEffect(() => {
     if (from) {
       writeStoredListQuery(from)
       setHref(listHrefFromQuery(from))
+      setLabel(listBackLabel(from))
       return
     }
     const stored = readStoredListQuery()
-    if (stored) setHref(listHrefFromQuery(stored))
+    if (stored) {
+      setHref(listHrefFromQuery(stored))
+      setLabel(listBackLabel(stored))
+    }
   }, [from])
 
   return (
     <Link href={href} className="ui-link inline-flex items-center gap-1.5 text-sm">
-      <span aria-hidden>←</span> All climbs
+      <span aria-hidden>←</span> {label}
     </Link>
   )
 }

@@ -17,10 +17,32 @@ export function isSafeListQuery(from: string | null | undefined): boolean {
   return true
 }
 
-/** `from` query value → href for the climbs list. */
+/** `from` query value → href for the climbs list or hold search. */
 export function listHrefFromQuery(from: string | null | undefined): string {
   if (!isSafeListQuery(from)) return '/'
-  return `/?${from}`
+  const qs = from as string
+  try {
+    const params = new URLSearchParams(qs)
+    if (params.get('view') === 'holds') {
+      params.delete('view')
+      const q = params.toString()
+      return q ? `/holds?${q}` : '/holds'
+    }
+  } catch {
+    /* fall through */
+  }
+  return `/?${qs}`
+}
+
+/** Label for back link from climb detail. */
+export function listBackLabel(from: string | null | undefined): string {
+  if (from == null || from === '') return 'All climbs'
+  try {
+    if (new URLSearchParams(from).get('view') === 'holds') return 'Hold search'
+  } catch {
+    /* ignore */
+  }
+  return 'All climbs'
 }
 
 export function readStoredListQuery(): string {

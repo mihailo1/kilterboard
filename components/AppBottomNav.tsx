@@ -4,12 +4,13 @@ import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { Suspense, type ReactNode } from 'react'
 
-type Tab = 'climbs' | 'set' | 'ai'
+type Tab = 'climbs' | 'holds' | 'set' | 'ai'
 
 function useActiveTab(): Tab {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   if (pathname?.startsWith('/playground')) return 'ai'
+  if (pathname?.startsWith('/holds')) return 'holds'
   if (pathname === '/' && searchParams.get('mode') === 'set') return 'set'
   return 'climbs'
 }
@@ -41,6 +42,19 @@ const TABS: Array<{
         />
         <circle cx="9.2" cy="10.2" r="1.1" fill="currentColor" />
         <circle cx="14.8" cy="8.4" r="1.1" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    id: 'holds',
+    href: '/holds',
+    label: 'Holds',
+    icon: (
+      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden>
+        <circle cx="8" cy="9" r="2.2" stroke="currentColor" strokeWidth="1.75" />
+        <circle cx="15.5" cy="7.5" r="1.8" stroke="currentColor" strokeWidth="1.75" />
+        <circle cx="12" cy="14.5" r="2.4" stroke="currentColor" strokeWidth="1.75" />
+        <circle cx="17" cy="15" r="1.5" stroke="currentColor" strokeWidth="1.75" />
       </svg>
     ),
   },

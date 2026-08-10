@@ -52,6 +52,11 @@ export interface SearchParams {
    * (frames contain Aurora delimiter `,"`). Default both.
    */
   climbKind?: ClimbKindFilter
+  /**
+   * Placement IDs that must all appear in frames as `p{id}r…` (AND).
+   * Used by hold search; typically with climbKind=boulders.
+   */
+  requiredPlacements?: number[]
 }
 
 export interface SearchResult {
@@ -302,6 +307,20 @@ export function searchClimbs(params: SearchParams = {}): SearchResult {
       extras ? 'r.is_route = 1' : `instr(r.frames, ',"') > 0`,
     )
   }
+
+  // Hold search: every selected placement must appear (role-agnostic `p{id}r`)
+  const placements = (params.requiredPlacements ?? [])
+    .map((n) => Math.floor(Number(n)))
+    .filter((n) => Number.isFinite(n) && n > 0)
+  const uniquePlacements = [...new Set(placements)].slice(0, 40)
+  for (let i = 0; i < uniquePlacements.length; i++) {
+    const id = uniquePlacements[i]!
+    const key = `hold${i}`
+    // frames tokens look like p1234r13 — match placement only
+    where.push(`instr(r.frames, @${key}) > 0`)
+    filterBinds[key] = `p${id}r`
+  }
+
   if (hasGradeFilter || params.requireGrade) {
     where.push('r.difficulty IS NOT NULL')
   }

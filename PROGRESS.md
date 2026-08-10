@@ -15,6 +15,16 @@
 
 ---
 
+## 2026-08-11 — v1.1.3 hold search (boulders only)
+
+- Dock tab **Holds** → `/holds` (4-col dock grid)
+- Set-style board (`HoldPickBoard` layers + markers); touch-safe pick
+- API `requiredPlacements` / `?holds=1,2,3` + forced boulders (AND `p{id}r`)
+- Filters: name/setter/angle/grade/sort/ascents/quality; **no** kind control
+- Banner: boulders only; back via `from` + `view=holds` → “Hold search”
+- Shared compact `.ui-field` on mobile; Name+Setter always one row; `.ui-filter-chip` (no full-width toggle row)
+- Scroll-collapse filters (same as Climbs)
+
 ## 2026-08-09 — v1.1.2 auto Boardsesh catalog
 
 - **Stale-aware** `sync-boardsesh.mjs`: compare CDN `builtAt` to local `meta` / `manifest-entry.json`; skip download when current

@@ -7,11 +7,11 @@ Agent / Copilot instructions for this repo.
 - **Chat with this user:** prefer Russian when they write in Russian
 - **Docs:** English (README, ARCHITECTURE, COPILOT); `AI.md` may be bilingual
 
-**Version:** `lib/version.ts` → `APP_VERSION` (currently **1.1.2**). Keep in sync with `package.json`.
+**Version:** `lib/version.ts` → `APP_VERSION` (currently **1.1.3**). Keep in sync with `package.json`.
 
 ## Project
 
-**Kilterboard** — Next.js app for Kilter Board 12×12 + kickboard: catalog, Set editor, Aurora BLE, local **Hold AR** boulder generation (ONNX in Web Worker).
+**Kilterboard** — Next.js app for Kilter Board 12×12 + kickboard: catalog, **hold search** (boulders), Set editor, Aurora BLE, local **Hold AR** (ONNX in Web Worker).
 
 Path: `~/Documents/reps.nosync/kilterboard`
 
@@ -47,7 +47,8 @@ npm run build
 
 1. Layout: Kilter original, size **10** (12×12 + kickboard)
 2. List filters: all angles default; grades Font/V via difficulty 10–33
-3. **List filter persistence:** URL query on `/` + `sessionStorage` key `kb:climb-list-qs`. Climb detail links include `from=<list qs>`; “All climbs” uses `BackToClimbs` (`lib/climb-list-url.ts`)
+3. **List filter persistence:** URL query on `/` or `/holds` + `sessionStorage` `kb:climb-list-qs`. Climb links use `from=`; `BackToClimbs` restores Climbs or Hold search (`view=holds`)
+4. **Hold search:** dock **Holds** → `/holds`; boulders only; `?holds=` placement AND-match; no kind filter
 4. BLE: Chrome/Edge or Android Chrome only — **no Safari/iOS**
 5. AI: **Hold AR only** (local ONNX). No remix in product UI.
 6. Playground: gen + paint; no feedback labels UI

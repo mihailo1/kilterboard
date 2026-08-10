@@ -271,9 +271,10 @@ body > * {
 .app-dock-inner {
   pointer-events: auto;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.2rem;
-  width: min(100%, 22.5rem);
+  /* Climbs · Holds · Set · Hold AR */
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.15rem;
+  width: min(100%, 26rem);
   border-radius: 1.35rem;
   border: 1px solid color-mix(in srgb, var(--color-border-strong) 90%, transparent);
   background: color-mix(in srgb, var(--color-surface) 78%, transparent);
@@ -464,15 +465,16 @@ body > * {
   width: 100%;
   appearance: none;
   -webkit-appearance: none;
-  border-radius: 0.9rem;
+  border-radius: 0.8rem;
   border: 1px solid color-mix(in srgb, var(--color-border-strong) 90%, transparent);
   background-color: var(--field-fill);
   background-image: var(--field-sheen);
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
-  padding: 0.7rem 0.9rem;
-  font-size: 0.875rem;
+  /* Compact on phone; slightly roomier from sm up — shared Climbs / Holds / Set */
+  padding: 0.55rem 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 1.35;
@@ -489,9 +491,83 @@ body > * {
     color 0.15s ease;
 }
 
+@media (min-width: 640px) {
+  .ui-field {
+    border-radius: 0.9rem;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.875rem;
+  }
+}
+
 /* Icon inside field — full padding shorthand on .ui-field would override Tailwind pl-* */
 .ui-field-with-icon {
-  padding-left: 2.55rem;
+  padding-left: 2rem;
+}
+
+@media (min-width: 640px) {
+  .ui-field-with-icon {
+    padding-left: 2.55rem;
+  }
+}
+
+/* Narrow dual Name/Setter columns on phone */
+@media (max-width: 639px) {
+  .ui-label {
+    letter-spacing: 0.1em;
+    font-size: 0.625rem;
+  }
+}
+
+/*
+  Compact filter chip — sits on the Name/Setter baseline (no extra row).
+  ~36px hit target; open state uses soft accent.
+*/
+.ui-filter-chip {
+  display: inline-flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.8rem;
+  border: 1px solid color-mix(in srgb, var(--color-border-strong) 80%, transparent);
+  background: color-mix(in srgb, var(--color-canvas-soft) 88%, transparent);
+  color: var(--color-muted);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.04) inset,
+    0 1px 2px rgb(0 0 0 / 0.1);
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+@media (min-width: 640px) {
+  .ui-filter-chip {
+    height: 2.55rem;
+    width: 2.55rem;
+    border-radius: 0.9rem;
+  }
+}
+
+.ui-filter-chip:hover {
+  border-color: color-mix(in srgb, var(--color-accent) 40%, var(--color-border));
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-2));
+}
+
+.ui-filter-chip[aria-expanded='true'] {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, transparent);
+  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 20%, transparent),
+    0 1px 0 rgb(255 255 255 / 0.04) inset;
+}
+
+.ui-filter-chip:active {
+  transform: scale(0.96);
 }
 
 .ui-field::placeholder {

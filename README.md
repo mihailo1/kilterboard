@@ -1,6 +1,6 @@
 # Kilterboard
 
-**v1.1.2** — Web app for the [Kilter Board](https://settercloset.com/pages/kilter-board) (12×12 + kickboard / Aurora).
+**v1.1.3** — Web app for the [Kilter Board](https://settercloset.com/pages/kilter-board) (12×12 + kickboard / Aurora).
 
 Browse community climbs, set your own boulders, light a physical board over **Web Bluetooth**, and generate holds with **Hold AR** — a local ONNX transformer that runs entirely in the browser (no cloud AI). Installable as a **PWA** (standalone display, home-screen icons, floating dock nav).
 
@@ -12,6 +12,7 @@ Browse community climbs, set your own boulders, light a physical board over **We
 ## Features
 
 - **Climbs** — search Boardsesh catalog (grade, angle, setter, quality, …)
+- **Hold search** — `/holds` pick holds on the wall (**boulders only**); same filters minus type
 - **Set** — paint holds (swipe or palette), multi-frame routes, local drafts
 - **Light board** — Web Bluetooth to Aurora / Kilter LEDs (`@hangtime/grip-connect`)
 - **Hold AR** — local neural generator (causal Transformer → ONNX → Web Worker)
@@ -45,6 +46,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | Mode | URL |
 |------|-----|
 | Climbs | `/` |
+| Hold search (boulders) | `/holds` |
 | Set | `/?mode=set` |
 | AI playground | `/playground` |
 | Climb detail | `/climb/[id]` |
@@ -123,7 +125,7 @@ lib/
   ai/boulder-ai.ts   # Hold AR bridge
   aurora/            # board frames + BLE
   boardsesh.ts       # SQLite search
-  version.ts         # APP_VERSION (1.1.2)
+  version.ts         # APP_VERSION (1.1.3)
 public/ai/           # ONNX + worker + ort wasm
 ml/hold-ar/          # Python train / ONNX export
 scripts/             # sync, train pack, ML export
@@ -165,6 +167,7 @@ Unofficial reverse-engineered client. **Not affiliated** with Aurora Climbing, K
 
 ## Version
 
+**1.1.3** — hold search (`/holds`, boulders only): wall pick + list filters; compact mobile fields/filter chip; 4-tab dock.  
 **1.1.2** — auto Boardsesh catalog refresh (stale-aware sync, `predev`, 4×/day GitHub → Vercel Deploy Hook).  
 **1.1.1** — restore climb list filters when leaving climb detail (“All climbs”); AppBrand / dock-only nav.  
 **1.1.0** — PWA polish (dock nav, install prompt, safe areas, maskable icons).  

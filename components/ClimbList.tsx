@@ -583,22 +583,22 @@ function ClimbListInner() {
       {/* Filters card — search always visible; extras unmount when collapsed (no gap) */}
       <section className="ui-card-sticky">
         {/* Search + collapse control */}
-        <div className="flex items-start gap-2">
-          <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-2">
-            <label className="ui-label">
+        <div className="flex items-end gap-2">
+          <div className="grid min-w-0 flex-1 grid-cols-2 gap-2 sm:gap-3">
+            <label className="ui-label min-w-0">
               Name
               <div className="relative">
-                <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-faint" />
+                <SearchIcon className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-faint sm:left-3.5 sm:h-4 sm:w-4" />
                 <input
                   type="search"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Search climbs…"
+                  placeholder="Name"
                   className="ui-field ui-field-with-icon"
                 />
               </div>
             </label>
-            <div className="ui-label relative">
+            <div className="ui-label relative min-w-0">
               <span>Setter</span>
               <input
                 type="search"
@@ -612,13 +612,12 @@ function ClimbListInner() {
                   setSetterSuggestOpen(true)
                 }}
                 onBlur={() => {
-                  // Delay so click on suggestion registers
                   setterBlurTimer.current = setTimeout(
                     () => setSetterSuggestOpen(false),
                     150,
                   )
                 }}
-                placeholder="Username"
+                placeholder="Setter"
                 className="ui-field"
                 autoComplete="off"
                 role="combobox"
@@ -656,9 +655,10 @@ function ClimbListInner() {
           <button
             type="button"
             onClick={toggleFiltersOpen}
-            className="mt-5 shrink-0 rounded-2xl border border-border bg-surface-2 px-2.5 py-2.5 text-muted transition hover:border-accent/30 hover:bg-surface-3 hover:text-accent sm:mt-6"
+            className="ui-filter-chip"
             aria-expanded={filtersOpen}
             aria-controls="climb-filters-extra"
+            aria-label={filtersOpen ? 'Hide filters' : 'Show filters'}
             title={filtersOpen ? 'Hide filters' : 'Show filters'}
           >
             <ChevronIcon open={filtersOpen} />

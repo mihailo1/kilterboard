@@ -1,4 +1,4 @@
-# Architecture — Kilterboard v1.1.2
+# Architecture — Kilterboard v1.1.3
 
 How the app is put together: data flow, layers, and constraints.  
 Agent rules: `COPILOT.md`. Local AI: **`AI.md`**.
@@ -6,9 +6,10 @@ Agent rules: `COPILOT.md`. Local AI: **`AI.md`**.
 ## Purpose
 
 1. **Browse** Kilter 12×12 kickboard climbs (Boardsesh).  
-2. **Set** custom boulders/routes (+ drafts, paint rules).  
-3. **Light** a physical Aurora/Kilter board (Web Bluetooth).  
-4. **Generate** boulders locally with **Hold AR** (ONNX transformer in Web Worker).
+2. **Search by holds** — boulders only (`/holds`).  
+3. **Set** custom boulders/routes (+ drafts, paint rules).  
+4. **Light** a physical Aurora/Kilter board (Web Bluetooth).  
+5. **Generate** boulders locally with **Hold AR** (ONNX transformer in Web Worker).
 
 ## High-level flow
 
@@ -24,6 +25,7 @@ flowchart TB
   subgraph App[Next.js]
     Home[HomeShell Climbs / Set]
     List[ClimbList]
+    Holds[HoldSearch /holds]
     API["/api/climbs + /api/setters"]
     Set[SetStudio]
     Play["/playground"]
@@ -32,6 +34,7 @@ flowchart TB
     Onnx[hold-ar-v1.onnx]
     Home --> List
     Home --> Set
+    Holds --> API
     List --> API --> DB
     Set --> Worker
     Play --> Worker
@@ -68,15 +71,25 @@ flowchart TB
 | Route | Role |
 |-------|------|
 | `GET /api/climbs` | Filters + pagination over `search_rows` |
+| `GET /api/climbs?holds=1,2,3` | AND match all placements (`p{id}r` in frames); forces **boulders** |
 | `GET /api/setters?q=` | Setter autocomplete |
 
 Runtime: **Node only** (`node:sqlite`). Grades: difficulty 10–33 → Font/V.
 
-### 2b. Climb list filter state
+### 2b. Hold search (`/holds`)
+
+- Dock tab **Holds** · `HoldSearch` + `HoldPickBoard` (Set-style board layers)
+- **Boulders only** (single-frame / `is_route = 0`); multi-frame routes excluded
+- Selection is role-agnostic; UI banner states the limitation
+- Same secondary filters as Climbs (name, setter, angle, grade, sort, ascents, quality) — **no** boulders/routes type control
+- Compact filter chip (`.ui-filter-chip`) beside Name/Setter; collapses on scroll like Climbs
+
+### 2c. Climb list filter state
 
 - **URL on `/`:** non-default filters as query (`name`, `setter`, `angle`, `sort`, `kind`, …) via `ClimbList` `router.replace`
-- **sessionStorage** `kb:climb-list-qs` — same string, backup for “All climbs”
-- **Climb detail:** `buildClimbHref(climb, listQs)` adds `from=<list qs>`; `BackToClimbs` → `/?…` so filters survive detail navigation
+- **`/holds`:** `view=holds` + `holds=` + same filter keys (no `kind`)
+- **sessionStorage** `kb:climb-list-qs` — shared restore for back navigation
+- **Climb detail:** `buildClimbHref` adds `from=`; `listHrefFromQuery` / `listBackLabel` route holds → `/holds?…`
 - Helpers: `lib/climb-list-url.ts`
 
 ### 3. Frames & board

@@ -51,12 +51,24 @@ export async function GET(request: NextRequest) {
   }
 
   const kindRaw = (sp.get('kind') ?? sp.get('climbKind') ?? 'both').toLowerCase()
-  const climbKind: ClimbKindFilter =
+  let climbKind: ClimbKindFilter =
     kindRaw === 'boulders' || kindRaw === 'boulder'
       ? 'boulders'
       : kindRaw === 'routes' || kindRaw === 'route'
         ? 'routes'
         : 'both'
+
+  /** Comma-separated placement IDs — climb must include all (AND). */
+  const holdsRaw = sp.get('holds') ?? sp.get('placements') ?? ''
+  const requiredPlacements = holdsRaw
+    .split(/[,+\s]+/)
+    .map((s) => Number(s.trim()))
+    .filter((n) => Number.isFinite(n) && n > 0)
+    .map((n) => Math.floor(n))
+  // Hold filter is only meaningful for single-frame boulders
+  if (requiredPlacements.length > 0) {
+    climbKind = 'boulders'
+  }
 
   try {
     const result = searchClimbs({
@@ -71,6 +83,7 @@ export async function GET(request: NextRequest) {
       maxDifficulty: num(sp, 'maxDifficulty'),
       minQuality: num(sp, 'minQuality'),
       climbKind,
+      requiredPlacements,
     })
 
     return NextResponse.json({
@@ -79,6 +92,8 @@ export async function GET(request: NextRequest) {
       meta: result.meta ?? getBoardseshMeta(),
       angleUsed: result.angleUsed,
       source: 'boardsesh',
+      holds: requiredPlacements,
+      climbKind,
     })
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Failed to query climbs'
