@@ -15,6 +15,14 @@
 
 ---
 
+## 2026-08-11 — v1.1.4 board UX polish
+
+- AppBrand: tighter orb (no gap to glow), small space between `v` and version number
+- Filters: fix flash-open when closed at scroll≈0 (`filtersPinnedClosed`); Name/Setter always one row; compact `.ui-filter-chip`
+- Hold search board chrome matches Set (`ui-card p-0` + header strip)
+- Set/Paint/KilterBoard mobile paint hits (pointerdown + anti double-toggle)
+- **Phone pan/zoom:** `react-zoom-pan-pinch` via `MobileBoardScroller` on all board surfaces; Set gesture: pan off, pinch on
+
 ## 2026-08-11 — v1.1.3 hold search (boulders only)
 
 - Dock tab **Holds** → `/holds` (4-col dock grid)

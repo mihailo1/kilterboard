@@ -8,6 +8,7 @@ import {
   useState,
   type CSSProperties,
   type PointerEvent as ReactPointerEvent,
+  type MouseEvent as ReactMouseEvent,
 } from 'react'
 import {
   boardHoldAt,
@@ -41,6 +42,7 @@ import { generateBoulder, loadBoulderAi } from '@/lib/ai/boulder-ai'
 import { difficultyToGrade } from '@/lib/grades'
 import type { HoldRole, HoldRoleId } from '@/types'
 import Link from 'next/link'
+import { MobileBoardScroller } from '@/components/MobileBoardScroller'
 
 type PaintTool = HoldRoleId | 'erase'
 /** palette = pick tool then tap; gesture = hold + swipe direction for role */
@@ -1017,6 +1019,13 @@ function InteractiveBoard({
         ? 'cursor-cell'
         : 'cursor-crosshair'
 
+  const lastPtr = useRef(0)
+  const paintHit = (placementId: number, fromPointer: boolean) => {
+    if (fromPointer) lastPtr.current = performance.now()
+    else if (performance.now() - lastPtr.current < 450) return
+    onPaint(placementId)
+  }
+
   const hitProps = (placementId: number) =>
     inputMode === 'gesture'
       ? {
@@ -1024,20 +1033,24 @@ function InteractiveBoard({
             startGesture(placementId, e),
         }
       : {
-          onClick: () => onPaint(placementId),
           onPointerDown: (e: ReactPointerEvent) => {
-            if (e.pointerType === 'touch') {
-              e.preventDefault()
-              onPaint(placementId)
-            }
+            if (e.button !== 0 && e.pointerType === 'mouse') return
+            e.preventDefault()
+            e.stopPropagation()
+            paintHit(placementId, true)
+          },
+          onClick: (e: ReactMouseEvent) => {
+            e.preventDefault()
+            paintHit(placementId, false)
           },
         }
 
   return (
+    <MobileBoardScroller disablePan={inputMode === 'gesture'}>
     <div ref={wrapRef} className={`relative w-full touch-none select-none ${cursor}`}>
       <svg
         viewBox={`0 0 ${boardWidth} ${boardHeight}`}
-        className="h-auto w-full"
+        className="h-auto w-full touch-none"
         preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label="Set holds on board"
@@ -1048,6 +1061,7 @@ function InteractiveBoard({
             href={layer.imageUrl}
             width={boardWidth}
             height={boardHeight}
+            pointerEvents="none"
           />
         ))}
 
@@ -1059,11 +1073,12 @@ function InteractiveBoard({
               key={`g-${p.placementId}`}
               cx={p.cx}
               cy={p.cy}
-              r={p.r * 0.62}
+              r={p.r * 0.72}
               fill="rgb(255 255 255 / 0.05)"
               stroke="rgb(255 255 255 / 0.14)"
               strokeWidth={1.5}
-              className="transition-opacity hover:fill-accent/20 hover:stroke-accent/50"
+              style={{ touchAction: 'none' }}
+              className="board-hold-hit transition-opacity hover:fill-accent/20 hover:stroke-accent/50"
               {...hitProps(p.placementId)}
             />
           )
@@ -1083,7 +1098,8 @@ function InteractiveBoard({
               stroke={hit.color}
               strokeWidth={Math.max(4, Math.round(p.r / 5))}
               strokeOpacity={0.95}
-              className="hold-marker"
+              style={{ touchAction: 'none' }}
+              className="hold-marker board-hold-hit"
               {...hitProps(p.placementId)}
             />
           )
@@ -1170,5 +1186,6 @@ function InteractiveBoard({
         </div>
       )}
     </div>
+    </MobileBoardScroller>
   )
 }

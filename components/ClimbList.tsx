@@ -191,7 +191,10 @@ function ClimbListInner() {
   /** Extra filters (type/angle/grade/…) expanded; auto-collapses on scroll down */
   const [filtersOpen, setFiltersOpen] = useState(true)
   const filtersOpenRef = useRef(true)
+  /** User manually opened — stay open until they close or leave top */
   const filtersPinnedOpen = useRef(false)
+  /** User manually closed (incl. at scroll≈0) — don’t flash open on first pixel of scroll */
+  const filtersPinnedClosed = useRef(false)
   const lastScrollY = useRef(0)
   /** Ignore scroll briefly after open/close — layout shift was causing expand/collapse jitter */
   const scrollIgnoreUntil = useRef(0)
@@ -283,7 +286,7 @@ function ClimbListInner() {
     scrollIgnoreUntil.current = performance.now() + 280
   }, [])
 
-  // Auto-collapse on scroll down only; expand only near page top (no scroll-up expand → no jitter)
+  // Auto-collapse on scroll down; re-open near top only if user didn’t force-close
   useEffect(() => {
     lastScrollY.current = typeof window !== 'undefined' ? window.scrollY : 0
 
@@ -295,21 +298,25 @@ function ClimbListInner() {
 
       if (performance.now() < scrollIgnoreUntil.current) return
 
-      // Near top — always expand, clear manual pin
+      // Left the top band — clear “closed at top” so next return-to-top can open
+      if (y > 72) {
+        filtersPinnedClosed.current = false
+      }
+
+      // Near top: open only if user didn’t manually collapse while here
       if (y < 40) {
         filtersPinnedOpen.current = false
-        setFiltersOpenStable(true)
+        if (!filtersPinnedClosed.current) {
+          setFiltersOpenStable(true)
+        }
         return
       }
 
-      // User manually expanded — keep open until they collapse or return to top
       if (filtersPinnedOpen.current) return
 
-      // Scroll down past threshold — collapse once (hysteresis: need y > 140)
       if (delta > 6 && y > 140) {
         setFiltersOpenStable(false)
       }
-      // Do NOT expand on scroll-up mid-page — that fought sticky height and jittered
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
@@ -318,8 +325,14 @@ function ClimbListInner() {
 
   const toggleFiltersOpen = useCallback(() => {
     const next = !filtersOpenRef.current
-    filtersPinnedOpen.current = next // pin only when manually opening
-    if (!next) filtersPinnedOpen.current = false
+    if (next) {
+      filtersPinnedOpen.current = true
+      filtersPinnedClosed.current = false
+    } else {
+      filtersPinnedOpen.current = false
+      // Remember manual close so scroll near 0 doesn’t flash open
+      filtersPinnedClosed.current = true
+    }
     setFiltersOpenStable(next)
   }, [setFiltersOpenStable])
 

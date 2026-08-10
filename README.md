@@ -1,6 +1,6 @@
 # Kilterboard
 
-**v1.1.3** — Web app for the [Kilter Board](https://settercloset.com/pages/kilter-board) (12×12 + kickboard / Aurora).
+**v1.1.4** — Web app for the [Kilter Board](https://settercloset.com/pages/kilter-board) (12×12 + kickboard / Aurora).
 
 Browse community climbs, set your own boulders, light a physical board over **Web Bluetooth**, and generate holds with **Hold AR** — a local ONNX transformer that runs entirely in the browser (no cloud AI). Installable as a **PWA** (standalone display, home-screen icons, floating dock nav).
 
@@ -125,7 +125,7 @@ lib/
   ai/boulder-ai.ts   # Hold AR bridge
   aurora/            # board frames + BLE
   boardsesh.ts       # SQLite search
-  version.ts         # APP_VERSION (1.1.3)
+  version.ts         # APP_VERSION (1.1.4)
 public/ai/           # ONNX + worker + ort wasm
 ml/hold-ar/          # Python train / ONNX export
 scripts/             # sync, train pack, ML export
@@ -167,6 +167,7 @@ Unofficial reverse-engineered client. **Not affiliated** with Aurora Climbing, K
 
 ## Version
 
+**1.1.4** — board polish: brand spacing, filter scroll fix, Set/Holds board chrome parity, mobile pan-zoom (`react-zoom-pan-pinch`), touch paint.  
 **1.1.3** — hold search (`/holds`, boulders only): wall pick + list filters; compact mobile fields/filter chip; 4-tab dock.  
 **1.1.2** — auto Boardsesh catalog refresh (stale-aware sync, `predev`, 4×/day GitHub → Vercel Deploy Hook).  
 **1.1.1** — restore climb list filters when leaving climb detail (“All climbs”); AppBrand / dock-only nav.  

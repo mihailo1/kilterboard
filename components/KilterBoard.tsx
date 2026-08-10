@@ -2,6 +2,7 @@
 
 import type { BoardHold } from '@/types'
 import { getBoardMeta } from '@/lib/aurora/board'
+import { MobileBoardScroller } from '@/components/MobileBoardScroller'
 
 interface KilterBoardProps {
   holds: BoardHold[]
@@ -34,9 +35,10 @@ export function KilterBoard({
     <div
       className={`w-full overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_12px_40px_-16px_rgb(0_0_0_/_0.55)] ${className}`}
     >
+      <MobileBoardScroller>
       <svg
         viewBox={`0 0 ${boardWidth} ${boardHeight}`}
-        className={`h-auto w-full select-none ${interactive ? 'touch-manipulation cursor-crosshair' : 'touch-none'}`}
+        className={`h-auto w-full select-none ${interactive ? 'touch-none cursor-crosshair' : 'touch-none'}`}
         preserveAspectRatio="xMidYMid meet"
         role={interactive ? 'group' : 'img'}
         aria-label={`${meta.layoutName} · ${meta.sizeName}${interactive ? ' · tap holds to flag bad' : ''}`}
@@ -57,7 +59,7 @@ export function KilterBoard({
           return (
             <g key={hold.placementId}>
               <circle
-                className="hold-marker"
+                className="hold-marker board-hold-hit"
                 cx={hold.cx}
                 cy={hold.cy}
                 r={r}
@@ -66,7 +68,7 @@ export function KilterBoard({
                 stroke={stroke}
                 strokeWidth={Math.max(4, Math.round(hold.r / 5)) * (bad ? 1.35 : 1)}
                 strokeOpacity={0.95}
-                style={interactive ? { cursor: 'pointer' } : undefined}
+                style={interactive ? { cursor: 'pointer', touchAction: 'none' } : undefined}
                 onClick={
                   interactive
                     ? (e) => {
@@ -112,6 +114,7 @@ export function KilterBoard({
           )
         })}
       </svg>
+      </MobileBoardScroller>
     </div>
   )
 }

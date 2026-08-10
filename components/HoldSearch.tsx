@@ -164,6 +164,7 @@ function HoldSearchInner() {
   const [filtersOpen, setFiltersOpen] = useState(true)
   const filtersOpenRef = useRef(true)
   const filtersPinnedOpen = useRef(false)
+  const filtersPinnedClosed = useRef(false)
   const lastScrollY = useRef(0)
   const scrollIgnoreUntil = useRef(0)
 
@@ -389,7 +390,7 @@ function HoldSearchInner() {
     scrollIgnoreUntil.current = performance.now() + 280
   }, [])
 
-  // Collapse extra filters on scroll down (same behaviour as Climbs list)
+  // Collapse on scroll down; don’t flash open at scroll≈0 after manual close
   useEffect(() => {
     lastScrollY.current = typeof window !== 'undefined' ? window.scrollY : 0
     const onScroll = () => {
@@ -398,9 +399,10 @@ function HoldSearchInner() {
       const delta = y - prev
       lastScrollY.current = y
       if (performance.now() < scrollIgnoreUntil.current) return
+      if (y > 72) filtersPinnedClosed.current = false
       if (y < 40) {
         filtersPinnedOpen.current = false
-        setFiltersOpenStable(true)
+        if (!filtersPinnedClosed.current) setFiltersOpenStable(true)
         return
       }
       if (filtersPinnedOpen.current) return
@@ -412,8 +414,13 @@ function HoldSearchInner() {
 
   const toggleFiltersOpen = useCallback(() => {
     const next = !filtersOpenRef.current
-    filtersPinnedOpen.current = next
-    if (!next) filtersPinnedOpen.current = false
+    if (next) {
+      filtersPinnedOpen.current = true
+      filtersPinnedClosed.current = false
+    } else {
+      filtersPinnedOpen.current = false
+      filtersPinnedClosed.current = true
+    }
     setFiltersOpenStable(next)
   }, [setFiltersOpenStable])
 
@@ -455,8 +462,8 @@ function HoldSearchInner() {
         </p>
       </div>
 
-      <section className="ui-card space-y-3 p-4 sm:space-y-4 sm:p-5">
-        <div className="flex items-center justify-between gap-3">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-3 px-0.5">
           <h2 className="text-sm font-semibold tracking-tight text-ink sm:text-[0.9375rem]">
             Select holds
           </h2>
@@ -473,7 +480,7 @@ function HoldSearchInner() {
           )}
         </div>
         <HoldPickBoard selected={selected} onToggle={toggleHold} />
-      </section>
+      </div>
 
       <section className="ui-card-sticky space-y-3 sm:space-y-4">
         {/* Fields + compact filter chip on the same baseline (no extra row) */}

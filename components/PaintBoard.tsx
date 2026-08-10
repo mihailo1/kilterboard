@@ -1,12 +1,13 @@
 'use client'
 
-import { useMemo, type CSSProperties } from 'react'
+import { useMemo, useRef, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import {
   boardHoldAt,
   getBoardMeta,
   listEditablePlacements,
 } from '@/lib/aurora/board'
 import type { HoldRole, HoldRoleId } from '@/types'
+import { MobileBoardScroller } from '@/components/MobileBoardScroller'
 
 export type PaintTool = HoldRoleId | 'erase'
 
@@ -107,21 +108,38 @@ export function PaintBoard({
     return Number(bRaw) !== a
   }
 
-  const hit = (placementId: number) => {
+  const lastPtr = useRef(0)
+  const hit = (placementId: number, fromPointer = false) => {
     if (disabled) return
+    if (fromPointer) lastPtr.current = performance.now()
+    else if (performance.now() - lastPtr.current < 450) return
     onPaint(placementId)
   }
+  const ptr = (placementId: number) => ({
+    onPointerDown: (e: ReactPointerEvent) => {
+      if (disabled) return
+      if (e.button !== 0 && e.pointerType === 'mouse') return
+      e.preventDefault()
+      e.stopPropagation()
+      hit(placementId, true)
+    },
+    onClick: (e: React.MouseEvent) => {
+      e.preventDefault()
+      hit(placementId, false)
+    },
+  })
 
   return (
     <div className={`space-y-3 ${className}`}>
       <div
         className={`relative w-full select-none overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_12px_40px_-16px_rgb(0_0_0_/_0.55)] ${
-          disabled ? 'opacity-70' : 'touch-manipulation'
+          disabled ? 'opacity-70' : ''
         } ${tool === 'erase' ? 'cursor-cell' : 'cursor-crosshair'}`}
       >
+        <MobileBoardScroller>
         <svg
           viewBox={`0 0 ${boardWidth} ${boardHeight}`}
-          className="h-auto w-full"
+          className="h-auto w-full touch-none"
           preserveAspectRatio="xMidYMid meet"
           role="img"
           aria-label="Edit holds on board"
@@ -136,7 +154,6 @@ export function PaintBoard({
             />
           ))}
 
-          {/* Ghost targets for empty placements */}
           {placements.map((p) => {
             if (painted.has(p.placementId)) return null
             return (
@@ -144,23 +161,17 @@ export function PaintBoard({
                 key={`g-${p.placementId}`}
                 cx={p.cx}
                 cy={p.cy}
-                r={p.r * 0.62}
+                r={p.r * 0.72}
                 fill="rgb(255 255 255 / 0.05)"
                 stroke="rgb(255 255 255 / 0.14)"
                 strokeWidth={1.5}
-                className="transition-opacity hover:fill-white/10 hover:stroke-white/40"
-                onClick={() => hit(p.placementId)}
-                onPointerDown={(e) => {
-                  if (e.pointerType === 'touch') {
-                    e.preventDefault()
-                    hit(p.placementId)
-                  }
-                }}
+                style={{ touchAction: 'none' }}
+                className="board-hold-hit transition-opacity hover:fill-white/10 hover:stroke-white/40"
+                {...ptr(p.placementId)}
               />
             )
           })}
 
-          {/* Active holds — stroke ALWAYS matches role color (never amber/foot-like “changed” tint) */}
           {placements.map((p) => {
             const hitPaint = painted.get(p.placementId)
             if (!hitPaint) return null
@@ -168,7 +179,6 @@ export function PaintBoard({
             const roleColor = hitPaint.color
             return (
               <g key={`a-${p.placementId}`}>
-                {/* Optional outer ring for edits — white, not orange */}
                 {changed && (
                   <circle
                     cx={p.cx}
@@ -190,18 +200,15 @@ export function PaintBoard({
                   stroke={roleColor}
                   strokeWidth={Math.max(4, Math.round(p.r / 5))}
                   strokeOpacity={0.95}
-                  onClick={() => hit(p.placementId)}
-                  onPointerDown={(e) => {
-                    if (e.pointerType === 'touch') {
-                      e.preventDefault()
-                      hit(p.placementId)
-                    }
-                  }}
+                  style={{ touchAction: 'none' }}
+                  className="hold-marker board-hold-hit"
+                  {...ptr(p.placementId)}
                 />
               </g>
             )
           })}
         </svg>
+        </MobileBoardScroller>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2">

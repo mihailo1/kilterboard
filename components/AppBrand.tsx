@@ -26,7 +26,7 @@ export function AppBrand({ title }: AppBrandProps) {
       </div>
       <span className="app-brand-version" title={`Kilterboard v${APP_VERSION}`}>
         <span className="app-brand-version-label">v</span>
-        {APP_VERSION}
+        <span>{APP_VERSION}</span>
       </span>
     </div>
   )

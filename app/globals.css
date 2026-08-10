@@ -150,27 +150,29 @@ body > * {
   min-width: 0;
 }
 
+/*
+  Logo fill: no empty ring between sphere and glow (wrap === mark size).
+  overflow:visible so drop-shadow isn’t clipped.
+*/
 .app-brand-mark-wrap {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 2.35rem;
+  height: 2.35rem;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--color-canvas) 55%, transparent);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
 }
 
-/*
-  Sphere: drop-shadow follows alpha (no rectangular halo gap).
-*/
 .app-brand-mark {
-  width: 2rem;
-  height: 2rem;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   display: block;
-  filter: drop-shadow(0 0 7px rgb(139 92 246 / 0.6))
-    drop-shadow(0 0 16px rgb(139 92 246 / 0.32));
+  filter: drop-shadow(0 0 6px rgb(139 92 246 / 0.55))
+    drop-shadow(0 0 14px rgb(139 92 246 / 0.28));
 }
 
 .app-brand-name {
@@ -192,7 +194,7 @@ body > * {
   flex-shrink: 0;
   display: inline-flex;
   align-items: baseline;
-  gap: 0.05em;
+  gap: 0.22em;
   padding: 0.28rem 0.55rem;
   border-radius: 9999px;
   border: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
@@ -209,7 +211,8 @@ body > * {
 .app-brand-version-label {
   font-weight: 500;
   color: var(--color-faint);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
+  margin-right: 0.05em;
 }
 
 @media (min-width: 640px) {
@@ -219,13 +222,13 @@ body > * {
   }
 
   .app-brand-mark-wrap {
-    width: 3rem;
-    height: 3rem;
+    width: 2.55rem;
+    height: 2.55rem;
   }
 
   .app-brand-mark {
-    width: 2.2rem;
-    height: 2.2rem;
+    width: 100%;
+    height: 100%;
   }
 
   .app-brand-name {
@@ -568,6 +571,32 @@ body > * {
 
 .ui-filter-chip:active {
   transform: scale(0.96);
+}
+
+/* Phone board pan/zoom chrome */
+.board-mobile-scroll {
+  position: relative;
+  width: 100%;
+  touch-action: none;
+}
+
+.board-mobile-scroll-hint {
+  margin: 0;
+  padding: 0.4rem 0.75rem 0.55rem;
+  text-align: center;
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+}
+
+@media (min-width: 640px) {
+  .board-mobile-scroll-hint {
+    display: none;
+  }
 }
 
 .ui-field::placeholder {
