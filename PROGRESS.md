@@ -15,6 +15,11 @@
 
 ---
 
+## 2026-08-11 — v1.1.5 Hold search filters
+
+- Removed scroll-to-collapse for filters on `/holds` (open/close only via chip)
+- Climbs list keeps scroll auto-collapse behavior
+
 ## 2026-08-11 — v1.1.4 board UX polish
 
 - AppBrand: tighter orb (no gap to glow), small space between `v` and version number

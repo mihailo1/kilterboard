@@ -7,7 +7,7 @@ Agent / Copilot instructions for this repo.
 - **Chat with this user:** prefer Russian when they write in Russian
 - **Docs:** English (README, ARCHITECTURE, COPILOT); `AI.md` may be bilingual
 
-**Version:** `lib/version.ts` → `APP_VERSION` (currently **1.1.4**). Keep in sync with `package.json`.
+**Version:** `lib/version.ts` → `APP_VERSION` (currently **1.1.5**). Keep in sync with `package.json`.
 
 ## Project
 
@@ -50,7 +50,7 @@ npm run build
 3. **List filter persistence:** URL query on `/` or `/holds` + `sessionStorage` `kb:climb-list-qs`. Climb links use `from=`; `BackToClimbs` restores Climbs or Hold search (`view=holds`)
 4. **Hold search:** dock **Holds** → `/holds`; boulders only; `?holds=` placement AND-match; no kind filter
 5. **Mobile boards:** wrap board surfaces in `MobileBoardScroller` (phone only); Set gesture mode uses `disablePan`
-6. **Filter scroll:** manual close sets `filtersPinnedClosed` so near-top scroll doesn’t flash filters open
+6. **Filter scroll (Climbs only):** manual close sets `filtersPinnedClosed` so near-top scroll doesn’t flash filters open. **Hold search:** no scroll auto-collapse
 4. BLE: Chrome/Edge or Android Chrome only — **no Safari/iOS**
 5. AI: **Hold AR only** (local ONNX). No remix in product UI.
 6. Playground: gen + paint; no feedback labels UI

@@ -162,11 +162,6 @@ function HoldSearchInner() {
     () => initial.minQuality > 0,
   )
   const [filtersOpen, setFiltersOpen] = useState(true)
-  const filtersOpenRef = useRef(true)
-  const filtersPinnedOpen = useRef(false)
-  const filtersPinnedClosed = useRef(false)
-  const lastScrollY = useRef(0)
-  const scrollIgnoreUntil = useRef(0)
 
   const [name, setName] = useState(initial.name)
   const [setter, setSetter] = useState(initial.setter)
@@ -383,47 +378,6 @@ function HoldSearchInner() {
     })
   }, [])
 
-  const setFiltersOpenStable = useCallback((open: boolean) => {
-    if (filtersOpenRef.current === open) return
-    filtersOpenRef.current = open
-    setFiltersOpen(open)
-    scrollIgnoreUntil.current = performance.now() + 280
-  }, [])
-
-  // Collapse on scroll down; don’t flash open at scroll≈0 after manual close
-  useEffect(() => {
-    lastScrollY.current = typeof window !== 'undefined' ? window.scrollY : 0
-    const onScroll = () => {
-      const y = window.scrollY
-      const prev = lastScrollY.current
-      const delta = y - prev
-      lastScrollY.current = y
-      if (performance.now() < scrollIgnoreUntil.current) return
-      if (y > 72) filtersPinnedClosed.current = false
-      if (y < 40) {
-        filtersPinnedOpen.current = false
-        if (!filtersPinnedClosed.current) setFiltersOpenStable(true)
-        return
-      }
-      if (filtersPinnedOpen.current) return
-      if (delta > 6 && y > 140) setFiltersOpenStable(false)
-    }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [setFiltersOpenStable])
-
-  const toggleFiltersOpen = useCallback(() => {
-    const next = !filtersOpenRef.current
-    if (next) {
-      filtersPinnedOpen.current = true
-      filtersPinnedClosed.current = false
-    } else {
-      filtersPinnedOpen.current = false
-      filtersPinnedClosed.current = true
-    }
-    setFiltersOpenStable(next)
-  }, [setFiltersOpenStable])
-
   const clearHolds = () => setSelected(new Set())
 
   const clearAll = () => {
@@ -540,7 +494,7 @@ function HoldSearchInner() {
           </div>
           <button
             type="button"
-            onClick={toggleFiltersOpen}
+            onClick={() => setFiltersOpen((o) => !o)}
             className="ui-filter-chip"
             aria-expanded={filtersOpen}
             aria-controls="hold-search-filters"

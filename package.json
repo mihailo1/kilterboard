@@ -1,7 +1,7 @@
 {
   "name": "kilterboard",
   "private": true,
-  "version": "1.1.4",
+  "version": "1.1.5",
   "scripts": {
     "predev": "node scripts/ensure-boardsesh-db.mjs",
     "dev": "next dev",

@@ -1,4 +1,4 @@
-# Architecture — Kilterboard v1.1.4
+# Architecture — Kilterboard v1.1.5
 
 How the app is put together: data flow, layers, and constraints.  
 Agent rules: `COPILOT.md`. Local AI: **`AI.md`**.
@@ -82,7 +82,7 @@ Runtime: **Node only** (`node:sqlite`). Grades: difficulty 10–33 → Font/V.
 - **Boulders only** (single-frame / `is_route = 0`); multi-frame routes excluded
 - Selection is role-agnostic; UI banner states the limitation
 - Same secondary filters as Climbs (name, setter, angle, grade, sort, ascents, quality) — **no** boulders/routes type control
-- Compact filter chip (`.ui-filter-chip`) beside Name/Setter; collapses on scroll like Climbs
+- Compact filter chip (`.ui-filter-chip`) beside Name/Setter; **Hold search does not auto-collapse on scroll** (manual only; Climbs still scroll-collapses)
 - **Phone board:** `MobileBoardScroller` (`react-zoom-pan-pinch`) — pinch zoom + pan on Set / Holds / viewer / playground; gesture-Set disables one-finger pan so role-swipe still works
 
 ### 2c. Climb list filter state
