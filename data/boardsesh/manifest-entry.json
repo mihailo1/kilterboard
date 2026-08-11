@@ -1,22 +1,22 @@
 {
   "boardType": "kilter",
   "layoutId": 1,
-  "key": "board-snapshots/v1/kilter/1/2026-08-10T08-50-57-999Z.db",
-  "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/1/2026-08-10T08-50-57-999Z.db",
-  "bytes": 271818752,
+  "key": "board-snapshots/v1/kilter/1/2026-08-11T08-15-17-016Z.db",
+  "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/1/2026-08-11T08-15-17-016Z.db",
+  "bytes": 273113088,
   "contentEncoding": "identity",
-  "builtAt": "2026-08-10T08:50:57.999Z",
+  "builtAt": "2026-08-11T08:15:17.016Z",
   "schemaVersion": 4,
   "tables": {
     "board_climbs": {
-      "rowCount": 374851,
-      "watermarkUpdatedAt": "2026-08-10T08:40:24.242157Z",
-      "watermarkSyncSeq": "1074423"
+      "rowCount": 374990,
+      "watermarkUpdatedAt": "2026-08-11T07:45:16.618156Z",
+      "watermarkSyncSeq": "1077368"
     },
     "board_climb_stats": {
-      "rowCount": 353126,
-      "watermarkUpdatedAt": "2026-08-10T08:50:35.975456Z",
-      "watermarkSyncSeq": "207265919"
+      "rowCount": 357633,
+      "watermarkUpdatedAt": "2026-08-11T08:13:36.113708Z",
+      "watermarkSyncSeq": "212837643"
     }
   }
 }
