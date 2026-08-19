@@ -1,5 +1,7 @@
 /** Local drafts for Set studio (device storage). */
 
+import { normalizeRoleId, resolveRoleStates } from '@/lib/aurora/board'
+
 export type SetKind = 'boulder' | 'route'
 
 export interface SetDraft {
@@ -125,4 +127,53 @@ export function newDraftId(): string {
     return crypto.randomUUID()
   }
   return `draft-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+}
+
+/** Draft title when importing a catalog climb into Set. */
+export function modifiedDraftName(original: string): string {
+  const base = original.trim() || 'Untitled'
+  if (/\(modified\)\s*$/i.test(base)) return base
+  return `${base} (modified)`
+}
+
+/**
+ * Aurora frames → absolute role maps for Set (classic role ids 12–15).
+ */
+export function framesMapsFromClimbFrames(
+  frames: string,
+): Array<Map<number, number>> {
+  const states = resolveRoleStates(frames)
+  if (!states.length) return [new Map()]
+  return states.map((state) => {
+    const m = new Map<number, number>()
+    for (const [id, role] of state) {
+      m.set(id, normalizeRoleId(role))
+    }
+    return m
+  })
+}
+
+/**
+ * Create + activate a local Set draft from a catalog boulder/route.
+ * Name: "{original} (modified)". Each call makes a fresh draft.
+ */
+export function openClimbInSetDraft(input: {
+  name: string
+  frames: string
+}): SetDraft {
+  const maps = framesMapsFromClimbFrames(input.frames)
+  const kind: SetKind = maps.length > 1 ? 'route' : 'boulder'
+  const id = newDraftId()
+  const now = new Date().toISOString()
+  const draft: SetDraft = {
+    id,
+    name: modifiedDraftName(input.name),
+    kind,
+    frames: framesToSerializable(maps),
+    frameIndex: 0,
+    createdAt: now,
+    updatedAt: now,
+  }
+  saveDraft(draft)
+  return draft
 }

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { BackToClimbs } from '@/components/BackToClimbs'
 import { FramePlayer } from '@/components/FramePlayer'
+import { OpenInSetButton } from '@/components/OpenInSetButton'
 import { getBoardMeta, frameCount } from '@/lib/aurora/board'
 import { getClimbById } from '@/lib/climbs'
 import type { Climb } from '@/types'
@@ -82,6 +83,7 @@ export default async function ClimbPage({ params, searchParams }: PageProps) {
         <p className="ui-meta">
           {meta.layoutName} · {meta.sizeName}
         </p>
+        <OpenInSetButton name={climb.name} frames={frames} />
       </header>
 
       <FramePlayer frames={frames} climbName={climb.name} />

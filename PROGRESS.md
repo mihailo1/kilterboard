@@ -15,6 +15,13 @@
 
 ---
 
+## 2026-08-19 — v1.1.6 Open climb in Set + brand icons
+
+- Climb detail: **Open in Set** → new local draft with frames + name `{original} (modified)`
+- Helpers: `modifiedDraftName`, `framesMapsFromClimbFrames`, `openClimbInSetDraft` in `lib/set-drafts.ts`
+- Roles normalized to classic 12–15; multi-frame → route draft; navigates to `/?mode=set`
+- **Brand icons unified** with PWA art: regenerated `favicon.png`, `apple-touch-icon.png`, `icons/icon-{16,32,192}.png`, and `icon.svg` from `icons/icon-512.png` (UI/tab were solid violet orb; PWA already had the geometric mark)
+
 ## 2026-08-11 — v1.1.5 Hold search filters
 
 - Removed scroll-to-collapse for filters on `/holds` (open/close only via chip)

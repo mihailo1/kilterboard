@@ -171,8 +171,9 @@ body > * {
   height: 100%;
   border-radius: 50%;
   display: block;
-  filter: drop-shadow(0 0 6px rgb(139 92 246 / 0.55))
-    drop-shadow(0 0 14px rgb(139 92 246 / 0.28));
+  /* Soft glow matching PWA mark (violet + cyan accents) */
+  filter: drop-shadow(0 0 6px rgb(167 139 250 / 0.5))
+    drop-shadow(0 0 12px rgb(45 212 191 / 0.22));
 }
 
 .app-brand-name {

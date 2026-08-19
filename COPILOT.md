@@ -7,11 +7,11 @@ Agent / Copilot instructions for this repo.
 - **Chat with this user:** prefer Russian when they write in Russian
 - **Docs:** English (README, ARCHITECTURE, COPILOT); `AI.md` may be bilingual
 
-**Version:** `lib/version.ts` → `APP_VERSION` (currently **1.1.5**). Keep in sync with `package.json`.
+**Version:** `lib/version.ts` → `APP_VERSION` (currently **1.1.6**). Keep in sync with `package.json`.
 
 ## Project
 
-**Kilterboard** — Next.js app for Kilter Board 12×12 + kickboard: catalog, **hold search** (boulders), Set editor, Aurora BLE, local **Hold AR** (ONNX in Web Worker).
+**Kilterboard** — Next.js app for Kilter Board 12×12 + kickboard: catalog, **hold search** (boulders), Set editor (**Open in Set** from climb → `{name} (modified)` draft), Aurora BLE, local **Hold AR** (ONNX in Web Worker). Brand mark matches PWA icons (`public/icons/icon-512.png`).
 
 Path: `~/Documents/reps.nosync/kilterboard`
 
@@ -62,12 +62,13 @@ app/
   page.tsx · playground/page.tsx · climb/[id]/page.tsx
   api/climbs · api/setters · layout.tsx (AppFooter + version)
 components/
-  HomeShell · ClimbList · SetStudio · AiPlayground
+  HomeShell · ClimbList · SetStudio · OpenInSetButton · AiPlayground
   PaintBoard · KilterBoard · BluetoothSet · AppFooter
 lib/
   version.ts · ai/boulder-ai.ts
   aurora/board.ts · aurora/device.ts
   boardsesh.ts · grades.ts · set-rules.ts · set-drafts.ts
+  # openClimbInSetDraft → "{name} (modified)" local draft
 public/ai/
   boulder/hold-ar-worker.js · hold-ar-v1.onnx · placement_index.json · models.json
   ort/   # onnxruntime-web wasm

@@ -1,4 +1,4 @@
-# Architecture — Kilterboard v1.1.5
+# Architecture — Kilterboard v1.1.6
 
 How the app is put together: data flow, layers, and constraints.  
 Agent rules: `COPILOT.md`. Local AI: **`AI.md`**.
@@ -103,6 +103,8 @@ Roles: 12 start, 13 hand, 14 finish, 15 foot.
 ### 4. Set studio
 
 `components/SetStudio.tsx` — single interactive board, drafts (localStorage), start/finish rules, BLE, **Hold AR generate**.
+
+**Open in Set** (`OpenInSetButton` on `/climb/[id]`): copies catalog frames → new draft via `openClimbInSetDraft` (`lib/set-drafts.ts`). Name: `{original} (modified)`. Roles normalized to 12–15. Multi-frame → `kind: route`.
 
 ### 5. Hold AR (local AI)
 
