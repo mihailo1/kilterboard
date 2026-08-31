@@ -11,6 +11,7 @@ type SingleProps = {
   formatValue?: (value: number) => string
   minLabel?: string
   maxLabel?: string
+  disabled?: boolean
 }
 
 const thumbClass =
@@ -26,16 +27,18 @@ export function SingleRangeSlider({
   formatValue = (v) => String(v),
   minLabel,
   maxLabel,
+  disabled,
 }: SingleProps) {
   return (
-    <div className="space-y-3">
+    <div className={disabled ? 'space-y-3 opacity-40' : 'space-y-3'}>
       <Slider.Root
-        className="relative flex h-7 w-full touch-none select-none items-center"
+        className="relative flex h-7 w-full touch-none select-none items-center data-[disabled]:cursor-not-allowed"
         min={min}
         max={max}
         step={step}
         value={[value]}
         onValueChange={(v) => onChange(v[0] ?? min)}
+        disabled={disabled}
         aria-label="Value"
       >
         <Slider.Track className="relative h-1.5 grow overflow-hidden rounded-full bg-surface-3">
