@@ -1,23 +1,23 @@
 {
   "boardType": "kilter",
   "layoutId": 1,
-  "key": "board-snapshots/v1/kilter/1/2026-09-28T15-23-34-955Z.db",
-  "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/1/2026-09-28T15-23-34-955Z.db",
-  "bytes": 280825856,
-  "uncompressedBytes": 280825856,
+  "key": "board-snapshots/v1/kilter/1/2026-09-29T14-02-18-391Z.db",
+  "url": "https://boardsesh-board-snapshots.t3.tigrisfiles.io/board-snapshots/v1/kilter/1/2026-09-29T14-02-18-391Z.db",
+  "bytes": 281313280,
+  "uncompressedBytes": 281313280,
   "contentEncoding": "identity",
-  "builtAt": "2026-09-28T15:23:34.955Z",
+  "builtAt": "2026-09-29T14:02:18.391Z",
   "schemaVersion": 10,
   "tables": {
     "board_climbs": {
-      "rowCount": 384359,
-      "watermarkUpdatedAt": "2026-09-28T12:40:46.578259Z",
-      "watermarkSyncSeq": "1846260"
+      "rowCount": 384981,
+      "watermarkUpdatedAt": "2026-09-29T12:13:17.428472Z",
+      "watermarkSyncSeq": "1848944"
     },
     "board_climb_stats": {
-      "rowCount": 368616,
-      "watermarkUpdatedAt": "2026-09-28T15:23:11.503204Z",
-      "watermarkSyncSeq": "377165274"
+      "rowCount": 368846,
+      "watermarkUpdatedAt": "2026-09-29T13:56:13.31355Z",
+      "watermarkSyncSeq": "380793365"
     }
   }
 }
