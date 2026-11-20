@@ -15,6 +15,13 @@
 
 ---
 
+## 2026-11-20 — v1.1.8 BLE on iOS Safari (iOSWebBLE extension)
+
+- iOS Safari has no native Web Bluetooth; the **iOSWebBLE / beacio** Safari Web Extension (App Store id6761301368) injects a spec `navigator.bluetooth`. grip-connect reads `navigator.bluetooth` lazily, so it works unchanged (filters + `optionalServices` declared, 20-byte `writeValueWithoutResponse`)
+- `lib/aurora/ble-env.ts`: `detectBleEnvironment()` → `supported | ios-safari | ios-standalone | ios-other-browser | unsupported`; `waitForWebBluetooth()` waits up to 2 s (`beacio:extension:ready` event + polling) because the extension can inject after hydration
+- `BluetoothSet`: "Checking Bluetooth…" while detecting; per-environment hints (install + enable steps, open in Safari tab instead of Home Screen app / other browser); re-detects on `visibilitychange` (user returns from Settings)
+- Gotchas: Safari extensions do not run in Home Screen web apps or other iOS browsers; "Allow for One Day" permission expires silently → tell users "Allow on Every Website"; `requestDevice` still needs a user gesture
+
 ## 2026-08-19 — v1.1.6 Open climb in Set + brand icons
 
 - Climb detail: **Open in Set** → new local draft with frames + name `{original} (modified)`

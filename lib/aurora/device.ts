@@ -4,9 +4,10 @@
  */
 
 import { AuroraBoard, type AuroraLedPlacement } from '@hangtime/grip-connect'
+import { hasWebBluetooth } from './ble-env'
 
 export function isWebBluetoothSupported(): boolean {
-  return typeof navigator !== 'undefined' && !!navigator.bluetooth
+  return hasWebBluetooth()
 }
 
 /** Module-level board instance (browser only). */
@@ -38,7 +39,7 @@ export function isBoardConnected(): boolean {
 export async function connectAndSetLeds(placements: AuroraLedPlacement[]): Promise<void> {
   if (!isWebBluetoothSupported()) {
     throw new Error(
-      'Web Bluetooth is not supported. Use Chrome or Edge on desktop/Android (HTTPS or localhost).',
+      'Web Bluetooth is not supported. Use Chrome or Edge on desktop/Android, or Safari on iPhone/iPad with the iOSWebBLE extension (HTTPS or localhost).',
     )
   }
 

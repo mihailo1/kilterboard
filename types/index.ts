@@ -46,7 +46,6 @@ export interface Climb {
 }
 
 export type BluetoothStatus =
-  | 'unsupported'
   | 'idle'
   | 'connecting'
   | 'connected'

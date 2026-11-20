@@ -7,7 +7,7 @@ Agent / Copilot instructions for this repo.
 - **Chat with this user:** prefer Russian when they write in Russian
 - **Docs:** English (README, ARCHITECTURE, COPILOT); `AI.md` may be bilingual
 
-**Version:** `lib/version.ts` → `APP_VERSION` (currently **1.1.6**). Keep in sync with `package.json`.
+**Version:** `lib/version.ts` → `APP_VERSION` (currently **1.1.8**). Keep in sync with `package.json`.
 
 ## Project
 
@@ -51,7 +51,7 @@ npm run build
 4. **Hold search:** dock **Holds** → `/holds`; boulders only; `?holds=` placement AND-match; no kind filter
 5. **Mobile boards:** wrap board surfaces in `MobileBoardScroller` (phone only); Set gesture mode uses `disablePan`
 6. **Filter scroll (Climbs only):** manual close sets `filtersPinnedClosed` so near-top scroll doesn’t flash filters open. **Hold search:** no scroll auto-collapse
-4. BLE: Chrome/Edge or Android Chrome only — **no Safari/iOS**
+4. BLE: Chrome/Edge or Android Chrome natively; **iOS Safari via iOSWebBLE extension** (injects `navigator.bluetooth`; detection + install hints in `lib/aurora/ble-env.ts` / `BluetoothSet`). No BLE in iOS Home Screen app or non-Safari iOS browsers
 5. AI: **Hold AR only** (local ONNX). No remix in product UI.
 6. Playground: gen + paint; no feedback labels UI
 

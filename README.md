@@ -25,11 +25,11 @@ Browse community climbs, set your own boulders, light a physical board over **We
 | | |
 |--|--|
 | Node | **≥ 22** (built-in `node:sqlite`) |
-| Browser (app + BLE) | **Chrome** or **Edge** (desktop / Android) |
+| Browser (app + BLE) | **Chrome** or **Edge** (desktop / Android), or **Safari on iOS / iPadOS 26+** with the [iOSWebBLE](https://apps.apple.com/app/id6761301368) extension |
 | Network | `localhost` or HTTPS for Bluetooth |
 | Optional hardware | Physical Kilter / Aurora LED board |
 
-**Not supported:** Safari / iOS Web Bluetooth.
+**iOS:** Safari has no native Web Bluetooth. The free iOSWebBLE (beacio) Safari extension injects a standard `navigator.bluetooth`; enable it in Settings → Apps → Safari → Extensions and allow it on this site. Does not work in the Home Screen app or in other iOS browsers (Chrome, Firefox…). Desktop Safari and Firefox: not supported.
 
 ## Quick start
 
@@ -168,6 +168,7 @@ Unofficial reverse-engineered client. **Not affiliated** with Aurora Climbing, K
 
 ## Version
 
+**1.1.8** — BLE on iPhone/iPad via the iOSWebBLE Safari extension (detection, install steps, Home Screen / other-browser hints).  
 **1.1.6** — Open climb in Set (`{name} (modified)` draft); brand icons unified with PWA geometric mark.  
 **1.1.5** — Hold search: filters no longer auto-collapse on scroll (manual chip only).  
 **1.1.4** — board polish: brand spacing, filter scroll fix, Set/Holds board chrome parity, mobile pan-zoom (`react-zoom-pan-pinch`), touch paint.  

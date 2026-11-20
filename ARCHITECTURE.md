@@ -130,13 +130,13 @@ English UI only. Warm dark + violet accent (`globals.css`). Footer shows **v1.0.
 ## Constraints
 
 - Node ≥ 22  
-- BLE: Chrome/Edge/Android Chrome only  
+- BLE: Chrome/Edge/Android Chrome natively; iOS/iPadOS Safari only via the iOSWebBLE extension (`lib/aurora/ble-env.ts`)  
 - Do not commit Boardsesh DB; re-run `sync:climbs`  
 - Large assets: ONNX ~33MB + wasm ~11MB (tracked for clone-and-run)
 
 ## Non-goals (v1)
 
 - Cloud AI API keys  
-- iOS Safari Bluetooth  
+- Native (extension-free) iOS Safari Bluetooth  
 - Product UI for remix/freq/cooccur/spatial generators  
 - In-app feedback retrain loop (legacy scripts may remain)

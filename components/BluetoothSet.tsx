@@ -9,9 +9,14 @@ import {
   disconnectBoard,
   getDeviceName,
   isBoardConnected,
-  isWebBluetoothSupported,
   setLeds,
 } from '@/lib/aurora/device'
+import {
+  type BleEnvironment,
+  detectBleEnvironment,
+  IOS_WEBBLE_APP_STORE_URL,
+  waitForWebBluetooth,
+} from '@/lib/aurora/ble-env'
 
 interface BluetoothSetProps {
   holds: BoardHold[]
@@ -26,23 +31,38 @@ export function BluetoothSet({ holds, climbName }: BluetoothSetProps) {
   const [status, setStatus] = useState<BluetoothStatus>('idle')
   const [deviceName, setDeviceName] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  /** null while checking (the iOS Safari extension may inject after hydration). */
+  const [env, setEnv] = useState<BleEnvironment | null>(null)
 
   useEffect(() => {
-    if (!isWebBluetoothSupported()) {
-      setStatus('unsupported')
-      return
+    let cancelled = false
+
+    const detect = async () => {
+      let next = detectBleEnvironment()
+      if (next === 'ios-safari' && (await waitForWebBluetooth())) next = 'supported'
+      if (cancelled) return
+      setEnv(next)
+      if (next === 'supported' && isBoardConnected()) {
+        setStatus('connected')
+        setDeviceName(getDeviceName())
+      }
     }
-    if (isBoardConnected()) {
-      setStatus('connected')
-      setDeviceName(getDeviceName())
+    void detect()
+
+    // User may enable the Safari extension in Settings and come back to this tab.
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void detect()
     }
+    document.addEventListener('visibilitychange', onVisible)
     return () => {
+      cancelled = true
+      document.removeEventListener('visibilitychange', onVisible)
       // keep connection across route changes within session
     }
   }, [])
 
   const handleSet = useCallback(async () => {
-    if (status === 'unsupported') return
+    if (env !== 'supported') return
     setError(null)
     const placements = holdsToLedPlacements(holds)
     const already = isBoardConnected()
@@ -64,7 +84,7 @@ export function BluetoothSet({ holds, climbName }: BluetoothSetProps) {
       setError(message)
       setStatus('error')
     }
-  }, [holds, status])
+  }, [holds, env])
 
   const handleClear = useCallback(async () => {
     if (!isBoardConnected()) return
@@ -89,14 +109,8 @@ export function BluetoothSet({ holds, climbName }: BluetoothSetProps) {
   const busy = status === 'connecting' || status === 'setting'
   const connected = status === 'connected' || (status === 'setting' && !!deviceName)
 
-  if (status === 'unsupported') {
-    return (
-      <div className="rounded-2xl border border-warn/25 bg-warn/10 px-4 py-3 text-sm text-ink-soft">
-        Web Bluetooth is not available. Open this app in <strong className="text-ink">Chrome</strong>{' '}
-        or <strong className="text-ink">Edge</strong> on desktop/Android (HTTPS or
-        localhost). Safari and iOS do not support it.
-      </div>
-    )
+  if (env && env !== 'supported') {
+    return <BluetoothUnavailable env={env} />
   }
 
   return (
@@ -105,11 +119,13 @@ export function BluetoothSet({ holds, climbName }: BluetoothSetProps) {
         <button
           type="button"
           onClick={handleSet}
-          disabled={busy}
+          disabled={busy || env === null}
           className="ui-btn-primary"
         >
           <BluetoothIcon />
-          {busy
+          {env === null
+            ? 'Checking Bluetooth…'
+            : busy
             ? status === 'connecting'
               ? 'Connecting…'
               : 'Setting…'
@@ -152,8 +168,9 @@ export function BluetoothSet({ holds, climbName }: BluetoothSetProps) {
           </>
         ) : (
           <>
-            Stand near the board, then tap Connect. Chrome/Edge only (Web
-            Bluetooth). API level auto-detects from device name.
+            Stand near the board, then tap Connect. Chrome/Edge, or Safari on
+            iPhone/iPad with the iOSWebBLE extension. API level auto-detects from
+            device name.
           </>
         )}
       </p>
@@ -161,6 +178,65 @@ export function BluetoothSet({ holds, climbName }: BluetoothSetProps) {
       {error && (
         <p className="rounded-2xl border border-rose-500/25 bg-rose-500/10 px-3 py-2 text-sm text-rose-100">
           {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
+function BluetoothUnavailable({ env }: { env: Exclude<BleEnvironment, 'supported'> }) {
+  const appStoreLink = (
+    <a
+      href={IOS_WEBBLE_APP_STORE_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="font-medium text-ink underline underline-offset-2"
+    >
+      iOSWebBLE
+    </a>
+  )
+
+  return (
+    <div className="rounded-2xl border border-warn/25 bg-warn/10 px-4 py-3 text-sm text-ink-soft">
+      {env === 'ios-safari' && (
+        <>
+          <p>
+            Safari needs the free {appStoreLink} extension to talk to the board.
+          </p>
+          <ol className="mt-2 list-decimal space-y-1 pl-5">
+            <li>Install {appStoreLink} from the App Store (iOS 26+).</li>
+            <li>
+              Settings → Apps → Safari → Extensions → turn it on and set{' '}
+              <strong className="text-ink">Other Websites</strong> to{' '}
+              <strong className="text-ink">Allow</strong>.
+            </li>
+            <li>
+              Back here, tap the page menu in the address bar → the extension →{' '}
+              <strong className="text-ink">Allow on Every Website</strong>, then reload.
+            </li>
+          </ol>
+        </>
+      )}
+      {env === 'ios-standalone' && (
+        <p>
+          Bluetooth does not work in the Home Screen app. Open this page in a{' '}
+          <strong className="text-ink">Safari</strong> tab with the {appStoreLink}{' '}
+          extension enabled.
+        </p>
+      )}
+      {env === 'ios-other-browser' && (
+        <p>
+          This browser cannot use Bluetooth on iOS. Open this page in{' '}
+          <strong className="text-ink">Safari</strong> with the {appStoreLink} extension
+          enabled.
+        </p>
+      )}
+      {env === 'unsupported' && (
+        <p>
+          Web Bluetooth is not available. Open this app in{' '}
+          <strong className="text-ink">Chrome</strong> or{' '}
+          <strong className="text-ink">Edge</strong> on desktop/Android (HTTPS or
+          localhost), or in Safari on iPhone/iPad with the {appStoreLink} extension.
         </p>
       )}
     </div>
