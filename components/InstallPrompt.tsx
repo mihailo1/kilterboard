@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { anyNotice, useNotices } from '@/lib/notices'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -24,6 +25,7 @@ export function InstallPrompt() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null)
   const [showIosTip, setShowIosTip] = useState(false)
   const [visible, setVisible] = useState(false)
+  const notices = useNotices()
 
   useEffect(() => {
     if (isStandalone()) return
@@ -74,7 +76,7 @@ export function InstallPrompt() {
     setVisible(false)
   }, [deferred])
 
-  if (!visible) return null
+  if (!visible || anyNotice(notices)) return null
 
   return (
     <div className="install-chip" role="region" aria-label="Install app">
@@ -86,7 +88,7 @@ export function InstallPrompt() {
           <p className="text-[11px] leading-snug text-muted">
             {showIosTip && !deferred
               ? 'Share → Add to Home Screen for the full app feel'
-              : 'Add to your home screen · works offline-ready'}
+              : 'Add to your home screen · works offline'}
           </p>
         </div>
         {deferred && (

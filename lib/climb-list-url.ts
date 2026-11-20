@@ -6,6 +6,8 @@
  * so “All climbs” can restore filters.
  */
 
+import type { Climb } from '@/types'
+
 export const CLIMB_LIST_QS_KEY = 'kb:climb-list-qs'
 
 /** True if `from` is a safe relative query string (no open redirect). */
@@ -62,4 +64,22 @@ export function writeStoredListQuery(qs: string): void {
   } catch {
     /* private mode */
   }
+}
+
+/**
+ * Climb detail URL. Pass `listQs` (current `/?…` filters) so “All climbs”
+ * can restore search/filters via the `from` param.
+ */
+export function buildClimbHref(climb: Climb, listQs = ''): string {
+  const qs = new URLSearchParams({
+    name: climb.name,
+    grade: climb.grade,
+    angle: String(climb.angle),
+    frames: climb.frames,
+  })
+  if (climb.setter) qs.set('setter', climb.setter)
+  if (climb.ascents != null)
+    qs.set('notes', `${climb.ascents.toLocaleString()} ascents`)
+  if (listQs) qs.set('from', listQs)
+  return `/climb/${climb.id}?${qs.toString()}`
 }

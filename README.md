@@ -149,6 +149,14 @@ Multi-frame routes: deltas joined by `,"`.
 | 14   | magenta | finish  |
 | 15   | orange  | foot    |
 
+## Versions, notices, offline
+
+- **Version** lives in `package.json` only (injected as `NEXT_PUBLIC_APP_VERSION`). `public/sw.js` repeats it in `const VERSION`; the production build fails if they differ, or if the newest `lib/changelog.ts` entry is not that version.
+- **Release:** bump `package.json` + `package-lock.json` + `public/sw.js` `VERSION`, add a `lib/changelog.ts` entry (newest first). Users get an "Update / Later" banner, then a "What's new" card once.
+- **Silent release** (no banner, auto-reload): `SILENT_UPDATE = true` in `sw.js` **and** `silent: true` on the changelog entry.
+- **New climbs:** `/api/climbs/new?since=` → climbs published after the last mark stored in `localStorage`.
+- **Offline:** `public/sw.js` caches pages (network-first), `/api/climbs*` answers per query (fallback marked `x-kb-cached`), static chunks, board images and the Hold AR model. Lists show "Climbs will load when you're back online" and reload on reconnect. Service worker runs in production builds only (`npm run build && npm start`).
+
 ## Bluetooth (API 3)
 
 Uses Nordic UART-style packets via grip-connect Aurora (same family as Climbest examples). Connect only after a user gesture. Clear LEDs before disconnect when possible.
@@ -168,6 +176,7 @@ Unofficial reverse-engineered client. **Not affiliated** with Aurora Climbing, K
 
 ## Version
 
+**1.2.0** — update prompt (service worker, Update / Later), What's new card per version, "new climbs since your last visit", offline mode (cached pages, Set, drafts, Playground model; climbs reload when back online).  
 **1.1.8** — BLE on iPhone/iPad via the iOSWebBLE Safari extension (detection, install steps, Home Screen / other-browser hints).  
 **1.1.6** — Open climb in Set (`{name} (modified)` draft); brand icons unified with PWA geometric mark.  
 **1.1.5** — Hold search: filters no longer auto-collapse on scroll (manual chip only).  

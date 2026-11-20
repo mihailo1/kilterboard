@@ -354,7 +354,19 @@ export function searchClimbs(params: SearchParams = {}): SearchResult {
        ORDER BY ${sort}
        LIMIT @limit OFFSET @offset`,
     )
-    .all({ ...filterBinds, limit, offset }) as Array<{
+    .all({ ...filterBinds, limit, offset }) as SearchRow[]
+
+  const climbs: Climb[] = rows.map(rowToClimb)
+
+  return {
+    results_count: countRow.n,
+    climbs,
+    meta: getBoardseshMeta(),
+    angleUsed,
+  }
+}
+
+type SearchRow = {
     uuid: string
     name: string
     setter: string | null
@@ -368,9 +380,9 @@ export function searchClimbs(params: SearchParams = {}): SearchResult {
     hold_count?: number | null
     frame_count?: number | null
     is_route?: number | null
-  }>
+  }
 
-  const climbs: Climb[] = rows.map((r) => {
+function rowToClimb(r: SearchRow): Climb {
     const frames = r.frames ?? ''
     let holdCount = r.hold_count ?? undefined
     let frameCount = r.frame_count ?? undefined
@@ -400,14 +412,49 @@ export function searchClimbs(params: SearchParams = {}): SearchResult {
       publishedAt: r.published_at,
       source: 'boardsesh',
     }
-  })
-
-  return {
-    results_count: countRow.n,
-    climbs,
-    meta: getBoardseshMeta(),
-    angleUsed,
   }
+
+/**
+ * Climbs published after `since` (ISO), one row per climb (most-climbed angle).
+ * Used by the "new climbs since your last visit" notice.
+ */
+export function newClimbsSince(
+  since: string | null,
+  limit = 5,
+): { latest: string | null; count: number; climbs: Climb[] } {
+  const db = getDb()
+  if (!hasSearchRows(db)) return { latest: null, count: 0, climbs: [] }
+  const latestRow = db
+    .prepare('SELECT MAX(published_at) AS latest FROM search_rows')
+    .get() as { latest: string | null } | undefined
+  const latest = latestRow?.latest ?? null
+  if (!since) return { latest, count: 0, climbs: [] }
+
+  const countRow = db
+    .prepare(
+      'SELECT COUNT(DISTINCT uuid) AS n FROM search_rows WHERE published_at > @since',
+    )
+    .get({ since }) as { n: number }
+
+  const extras = searchRowsHasExtras(db)
+  const selectExtras = extras ? ', r.hold_count, r.frame_count, r.is_route' : ''
+  const cap = Math.min(Math.max(limit, 1), 20)
+  // SQLite: bare columns come from the row that holds MAX(...) in each group.
+  const rows = db
+    .prepare(
+      `SELECT
+         r.uuid, r.name, r.setter, r.frames, r.published_at, r.created_at,
+         r.angle, r.difficulty, r.ascents, r.quality${selectExtras},
+         MAX(COALESCE(r.ascents, 0)) AS _top
+       FROM search_rows r
+       WHERE r.published_at > @since
+       GROUP BY r.uuid
+       ORDER BY r.published_at DESC
+       LIMIT @limit`,
+    )
+    .all({ since, limit: cap }) as SearchRow[]
+
+  return { latest, count: countRow.n, climbs: rows.map(rowToClimb) }
 }
 
 /**

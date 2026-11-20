@@ -125,7 +125,11 @@ Roles: 12 start, 13 hand, 14 finish, 15 foot.
 
 ### 7. UI / design
 
-English UI only. Warm dark + violet accent (`globals.css`). Footer shows **v1.0.0** (`lib/version.ts`).
+English UI only. Warm dark + violet accent (`globals.css`). Header shows the version from `package.json` (`lib/version.ts`).
+
+### 8. Updates, notices, offline
+
+`SWRegister` registers `public/sw.js` (prod only). A waiting worker → `UpdatePrompt` (Update / Later, `lib/notices.ts`). `AppNotices` stack above the dock: offline pill + one card (update > `WhatsNew` from `lib/changelog.ts` > `NewClimbsNotice` via `/api/climbs/new`). Install chip hides while a card shows. Offline: pages network-first + cache, `/api/climbs*` network-first with per-query fallback (`x-kb-cached`), static/AI/board assets cache-first; `ClimbList` / `HoldSearch` reload on reconnect (`lib/online.ts`). `KeepPageOffline` asks the SW to keep pages reached by client-side navigation.
 
 ## Constraints
 

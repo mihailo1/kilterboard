@@ -15,6 +15,18 @@
 
 ---
 
+## 2026-11-20 — v1.2.0 Versions, notices, offline (ported from mob-recipes)
+
+- Version source = `package.json` → `NEXT_PUBLIC_APP_VERSION`; `next.config.ts` fails prod build if `public/sw.js` `VERSION`, `SILENT_UPDATE`/`silent`, or newest `lib/changelog.ts` entry disagree
+- `SWRegister` + `public/sw.js`: new worker waits → `UpdatePrompt` (Update / Later per session); first install activates at once
+- `WhatsNew`: once per version; brand-new users recorded silently; users with existing `kilterboard:*` / `kb-*` keys see all listed releases
+- `NewClimbsNotice`: `/api/climbs/new?since=` (`newClimbsSince` in `lib/boardsesh.ts`, distinct uuids by `published_at`); first visit stores mark silently
+- Offline: `OfflineBanner` pill ("Climbs will load when you're back online"), list fallback from SW cache with note, auto reload on reconnect; `/offline.html` for never-visited pages
+- `KeepPageOffline` posts `KEEP_PAGE` after client-side navigation (next/link never hits the SW as a page request); SW caches pages even with Next's `no-store` on dynamic routes
+- Service workers do not run in the Claude desktop browser pane; test in real Chrome (`npm run build && npm start`, then stop the server to simulate offline)
+- `buildClimbHref` moved to `lib/climb-list-url.ts` (re-exported from `ClimbList`)
+- Boardsesh CDN has not published a new snapshot since **2026-10-03** (all boards); our refresh workflow runs fine and reports "up to date"
+
 ## 2026-11-20 — v1.1.8 BLE on iOS Safari (iOSWebBLE extension)
 
 - iOS Safari has no native Web Bluetooth; the **iOSWebBLE / beacio** Safari Web Extension (App Store id6761301368) injects a spec `navigator.bluetooth`. grip-connect reads `navigator.bluetooth` lazily, so it works unchanged (filters + `optionalServices` declared, 20-byte `writeValueWithoutResponse`)

@@ -14,7 +14,12 @@ import {
   type ClimbKind,
 } from '@/lib/boardsesh-client'
 import { DualRangeSlider, SingleRangeSlider } from '@/components/RangeSliders'
-import { writeStoredListQuery } from '@/lib/climb-list-url'
+import { buildClimbHref, writeStoredListQuery } from '@/lib/climb-list-url'
+import { SW_CACHED_HEADER, useOnReconnect } from '@/lib/online'
+
+const OFFLINE_MESSAGE = "You're offline. Climbs will load when you're back online."
+
+export { buildClimbHref }
 
 const PAGE_SIZE = 25
 const DEFAULT_MIN_DIFF = 10
@@ -185,6 +190,8 @@ function ClimbListInner() {
   const [meta, setMeta] = useState<MetaInfo | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  /** List came from the service worker cache (offline / slow network). */
+  const [fromCache, setFromCache] = useState(false)
   const [advancedOpen, setAdvancedOpen] = useState(
     () => initial.minQuality > 0,
   )
@@ -440,12 +447,21 @@ function ClimbListInner() {
 
       const res = await fetch(`/api/climbs?${qs}`)
       const data = await res.json()
+      if (data.offline) throw new Error(OFFLINE_MESSAGE)
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`)
+      setFromCache(res.headers.get(SW_CACHED_HEADER) === '1')
       setClimbs(data.climbs as Climb[])
       setTotal(data.results_count as number)
       setMeta((data.meta as MetaInfo) ?? null)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load climbs')
+      setFromCache(false)
+      setError(
+        !navigator.onLine
+          ? OFFLINE_MESSAGE
+          : e instanceof Error
+            ? e.message
+            : 'Failed to load climbs',
+      )
       setClimbs([])
       setTotal(0)
     } finally {
@@ -468,6 +484,9 @@ function ClimbListInner() {
   useEffect(() => {
     void load()
   }, [load])
+
+  // Back online: fetch fresh climbs (replaces an error or a cached list).
+  useOnReconnect(() => void load())
 
   const builtLabel = meta?.built_at
     ? new Date(meta.built_at).toLocaleDateString(undefined, {
@@ -919,10 +938,19 @@ function ClimbListInner() {
         </a>
       </div>
 
-      {error && (
+      {error === OFFLINE_MESSAGE ? (
+        <div className="rounded-2xl border border-warn/25 bg-warn/10 px-4 py-3 text-sm text-ink-soft">
+          {error}
+        </div>
+      ) : error ? (
         <div className="rounded-2xl border border-rose-500/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-100">
           {error}
         </div>
+      ) : null}
+      {fromCache && !error && (
+        <p className="rounded-2xl border border-warn/25 bg-warn/10 px-4 py-2.5 text-xs text-ink-soft">
+          Offline: showing climbs saved from your last visit. Fresh climbs load when you&apos;re back online.
+        </p>
       )}
 
       {/* List */}
@@ -1106,22 +1134,4 @@ function formatCount(n: number): string {
   if (n >= 10_000) return `${Math.round(n / 1000)}k`
   if (n >= 1000) return `${(n / 1000).toFixed(1)}k`
   return n.toLocaleString()
-}
-
-/**
- * Climb detail URL. Pass `listQs` (current `/?…` filters) so “All climbs”
- * can restore search/filters via the `from` param.
- */
-export function buildClimbHref(climb: Climb, listQs = ''): string {
-  const qs = new URLSearchParams({
-    name: climb.name,
-    grade: climb.grade,
-    angle: String(climb.angle),
-    frames: climb.frames,
-  })
-  if (climb.setter) qs.set('setter', climb.setter)
-  if (climb.ascents != null)
-    qs.set('notes', `${climb.ascents.toLocaleString()} ascents`)
-  if (listQs) qs.set('from', listQs)
-  return `/climb/${climb.id}?${qs.toString()}`
 }

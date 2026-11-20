@@ -13,7 +13,10 @@ import {
 import { DualRangeSlider, SingleRangeSlider } from '@/components/RangeSliders'
 import { HoldPickBoard } from '@/components/HoldPickBoard'
 import { writeStoredListQuery } from '@/lib/climb-list-url'
-import { buildClimbHref } from '@/components/ClimbList'
+import { SW_CACHED_HEADER, useOnReconnect } from '@/lib/online'
+
+const OFFLINE_MESSAGE = "You're offline. Climbs will load when you're back online."
+import { buildClimbHref } from '@/lib/climb-list-url'
 
 const PAGE_SIZE = 25
 const DEFAULT_MIN_DIFF = 10
@@ -158,6 +161,8 @@ function HoldSearchInner() {
   const [meta, setMeta] = useState<MetaInfo | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  /** List came from the service worker cache (offline / slow network). */
+  const [fromCache, setFromCache] = useState(false)
   const [advancedOpen, setAdvancedOpen] = useState(
     () => initial.minQuality > 0,
   )
@@ -340,12 +345,21 @@ function HoldSearchInner() {
 
       const res = await fetch(`/api/climbs?${qs}`)
       const data = await res.json()
+      if (data.offline) throw new Error(OFFLINE_MESSAGE)
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`)
+      setFromCache(res.headers.get(SW_CACHED_HEADER) === '1')
       setClimbs(data.climbs as Climb[])
       setTotal(data.results_count as number)
       setMeta((data.meta as MetaInfo) ?? null)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load climbs')
+      setFromCache(false)
+      setError(
+        !navigator.onLine
+          ? OFFLINE_MESSAGE
+          : e instanceof Error
+            ? e.message
+            : 'Failed to load climbs',
+      )
       setClimbs([])
       setTotal(0)
     } finally {
@@ -368,6 +382,9 @@ function HoldSearchInner() {
   useEffect(() => {
     void load()
   }, [load])
+
+  // Back online: fetch fresh climbs (replaces an error or a cached list).
+  useOnReconnect(() => void load())
 
   const toggleHold = useCallback((id: number) => {
     setSelected((prev) => {
@@ -673,10 +690,19 @@ function HoldSearchInner() {
         </span>
       </div>
 
-      {error && (
+      {error === OFFLINE_MESSAGE ? (
+        <div className="rounded-2xl border border-warn/25 bg-warn/10 px-4 py-3 text-sm text-ink-soft">
+          {error}
+        </div>
+      ) : error ? (
         <div className="rounded-2xl border border-rose-500/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-100">
           {error}
         </div>
+      ) : null}
+      {fromCache && !error && (
+        <p className="rounded-2xl border border-warn/25 bg-warn/10 px-4 py-2.5 text-xs text-ink-soft">
+          Offline: showing climbs saved from your last visit. Fresh climbs load when you&apos;re back online.
+        </p>
       )}
 
       <section className="flex flex-col gap-2.5">

@@ -7,7 +7,7 @@ Agent / Copilot instructions for this repo.
 - **Chat with this user:** prefer Russian when they write in Russian
 - **Docs:** English (README, ARCHITECTURE, COPILOT); `AI.md` may be bilingual
 
-**Version:** `lib/version.ts` → `APP_VERSION` (currently **1.1.8**). Keep in sync with `package.json`.
+**Version:** `package.json` is the source (currently **1.2.0**) → `NEXT_PUBLIC_APP_VERSION` → `lib/version.ts`. Bump `public/sw.js` `VERSION` and add a `lib/changelog.ts` entry in the same release (build fails otherwise). See README "Versions, notices, offline".
 
 ## Project
 

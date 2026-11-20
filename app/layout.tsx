@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from 'next'
 import { DM_Sans, Fraunces } from 'next/font/google'
 import { AppBottomNav } from '@/components/AppBottomNav'
+import { AppNotices } from '@/components/AppNotices'
 import { InstallPrompt } from '@/components/InstallPrompt'
+import { KeepPageOffline } from '@/components/KeepPageOffline'
+import { SWRegister } from '@/components/SWRegister'
 import { APP_NAME, APP_VERSION } from '@/lib/version'
 import './globals.css'
 
@@ -70,6 +73,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="app-main flex min-h-0 w-full flex-1 flex-col">{children}</div>
         <AppBottomNav />
         <InstallPrompt />
+        <AppNotices />
+        <SWRegister />
+        <KeepPageOffline />
         <span className="sr-only">
           {APP_NAME} version {APP_VERSION}
         </span>
