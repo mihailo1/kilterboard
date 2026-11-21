@@ -15,6 +15,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.3.0',
+    title: 'Hold AR v2: better generated climbs',
+    items: [
+      'A new model trained on climbs from every angle, and taught which climbs people actually climb and rate well',
+      'It knows where each hold is on the wall, so moves and feet make more sense',
+      'Each Generate tries several climbs and keeps the one that looks most like a real climb of your grade',
+      'Smaller download: the model is about a third of the old size',
+    ],
+  },
+  {
     version: '1.2.0',
     title: 'Updates, news and offline',
     items: [

@@ -86,11 +86,13 @@ Requires **Node ≥ 22** (`node:sqlite`). `/api/climbs` returns **503** if the D
 
 ## Hold AR (local AI)
 
-Generation does **not** call OpenAI/Anthropic/etc. A small transformer was trained offline on ~100k real single-frame boulders @40°, exported to ONNX, and runs with **onnxruntime-web** in a Worker.
+Generation does **not** call OpenAI/Anthropic/etc. **Hold AR v2** is a small transformer trained offline on ~320k real single-frame boulders at every angle, conditioned on grade, angle and how well-rated a climb is. It runs as int8 ONNX with **onnxruntime-web** in a Worker, samples 8 candidates and keeps the one whose predicted grade matches the request.
 
 | Asset | Path |
 |-------|------|
-| Model | `public/ai/boulder/hold-ar-v1.onnx` (~33 MB) |
+| Model | `public/ai/boulder/hold-ar-v2.int8.onnx` (~10 MB) |
+| Grade predictor (rerank) | `public/ai/boulder/grade-v2.int8.onnx` (~2.4 MB) |
+| Meta + decode defaults | `public/ai/boulder/hold-ar-v2.meta.json` |
 | Placement map | `public/ai/boulder/placement_index.json` |
 | Worker | `public/ai/boulder/hold-ar-worker.js` |
 | Client API | `lib/ai/boulder-ai.ts` |
@@ -98,17 +100,14 @@ Generation does **not** call OpenAI/Anthropic/etc. A small transformer was train
 ### Retrain (optional)
 
 ```bash
-npm run ml:export-sequences   # SQLite → data/ml/
-cd ml/hold-ar
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python train.py --data ../../data/ml --out artifacts --epochs 12 --device mps \
-  --d-model 384 --n-layers 4 --n-heads 6
-cd ../..
-npm run ml:export-onnx        # copy ONNX into public/
+cd ml/hold-ar && python3.12 -m venv .venv && ./.venv/bin/pip install -r requirements.txt && cd ../..
+npm run ml:export-v2          # SQLite → data/ml/v2/
+npm run ml:train-v2           # grade predictor + AR model (MPS: ~1 h)
+npm run ml:eval-v2            # real vs v1 vs v2 generation metrics
+npm run ml:export-v2-onnx     # int8 ONNX + meta → public/ai/boulder/
 ```
 
-See **`AI.md`** and **`docs/AI-PLAN-B-STRUCTURED.md`** for architecture and metrics.
+See **`AI.md`** (architecture, decode) and **`ml/hold-ar/EVAL.md`** (metrics).
 
 Also useful:
 
@@ -176,6 +175,7 @@ Unofficial reverse-engineered client. **Not affiliated** with Aurora Climbing, K
 
 ## Version
 
+**1.3.0** — Hold AR v2: quality/angle-conditioned model with board geometry, best-of-8 by predicted grade, int8 (≈12 MB instead of 33 MB); generated climbs are statistically indistinguishable from well-rated real ones in offline eval (`ml/hold-ar/EVAL.md`).  
 **1.2.0** — update prompt (service worker, Update / Later), What's new card per version, "new climbs since your last visit", offline mode (cached pages, Set, drafts, Playground model; climbs reload when back online).  
 **1.1.8** — BLE on iPhone/iPad via the iOSWebBLE Safari extension (detection, install steps, Home Screen / other-browser hints).  
 **1.1.6** — Open climb in Set (`{name} (modified)` draft); brand icons unified with PWA geometric mark.  

@@ -1,0 +1,51 @@
+{
+  "version": 2,
+  "model": "hold-ar-v2",
+  "onnx": "hold-ar-v2.int8.onnx",
+  "gradeOnnx": "grade-v2.int8.onnx",
+  "order": "climb",
+  "vocab": 1905,
+  "nPlacements": 476,
+  "stopClass": 1904,
+  "maxLen": 22,
+  "inputs": [
+    "seq",
+    "mask",
+    "grade",
+    "angle",
+    "quality"
+  ],
+  "gradeNorm": "(difficulty - 10) / 23",
+  "angleNorm": "angle / 70",
+  "quality": {
+    "unverified": 0,
+    "few": 1,
+    "solid": 2,
+    "great": 3,
+    "unknown": 4
+  },
+  "arch": {
+    "dModel": 384,
+    "layers": 4,
+    "heads": 6
+  },
+  "valGreat": {
+    "nll": 3.165431929548315,
+    "acc": 0.2567324175943406,
+    "acc5": 0.517370830892086
+  },
+  "int8": {
+    "top1Agree": 0.9921875,
+    "kl": 0.000360790902050212
+  },
+  "decode": {
+    "candidates": 8,
+    "temperature": 1.0,
+    "topP": 1.0,
+    "minP": 0.0,
+    "guidance": 0,
+    "gradeWeight": 1.0,
+    "likWeight": 0.0
+  },
+  "createdAt": "2026-11-20T23:57:11.132558+00:00"
+}

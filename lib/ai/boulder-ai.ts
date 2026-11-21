@@ -1,10 +1,11 @@
 /**
  * Client bridge → Hold AR Web Worker (local ONNX next-hold generator).
  *
- * Runtime: public/ai/boulder/hold-ar-worker.js
- * Model:   public/ai/boulder/hold-ar-v1.onnx
+ * Runtime: public/ai/boulder/hold-ar-worker.js (decoding mirrors ml/hold-ar/decode.py)
+ * Model:   public/ai/boulder/hold-ar-v2.int8.onnx + grade-v2.int8.onnx (rerank)
+ * Meta:    public/ai/boulder/hold-ar-v2.meta.json (decode defaults)
  * Index:   public/ai/boulder/placement_index.json
- * Coords:  public/ai/boulder/models.json (layout + optional rules)
+ * Coords:  public/ai/boulder/models.json
  */
 
 export type BoulderModelId = 'hold-ar'
@@ -23,6 +24,8 @@ export interface GenerateResult {
     holdCount: number
     starts: number
     finishes: number
+    /** Grade predictor's estimate for the chosen climb (difficulty 10–33). */
+    predictedGrade?: number | null
   }
 }
 
@@ -94,8 +97,10 @@ export const loadHoldArAi = loadBoulderAi
 export function generateBoulder(opts: {
   model?: BoulderModelId | string
   grade?: number
+  /** Wall angle in degrees (default 40). */
+  angle?: number
   seed?: number
-  /** Softmax temperature (default 0.85) */
+  /** Sampling temperature (default from hold-ar-v2.meta.json). */
   temperature?: number
 }): Promise<GenerateResult> {
   return loadBoulderAi().then(
@@ -114,6 +119,7 @@ export function generateBoulder(opts: {
                 holdCount: data.meta.holdCount,
                 starts: data.meta.starts,
                 finishes: data.meta.finishes,
+                predictedGrade: data.meta.predictedGrade ?? null,
               },
             })
           } else if (data.type === 'error') {
@@ -125,8 +131,9 @@ export function generateBoulder(opts: {
         w.postMessage({
           type: 'generate',
           grade: opts.grade,
+          angle: opts.angle,
           seed: opts.seed,
-          temperature: opts.temperature ?? 0.85,
+          temperature: opts.temperature,
         })
       }),
   )

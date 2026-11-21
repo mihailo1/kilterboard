@@ -15,6 +15,18 @@
 
 ---
 
+## 2026-11-21 — v1.3.0 Hold AR v2
+
+- Problem found: v1 trained on 40° only and ~64% of its climbs had 0–2 ascents; heuristic mask + `polishClimb` overrode the model; only metric was next-token accuracy
+- New eval (`ml/hold-ar/eval_gen.py`, results in `ml/hold-ar/EVAL.md`): grade error by an independent predictor, realism (feature Wasserstein), C2ST AUC, copy rate, diversity vs held-out great climbs @40°
+- v2 data (`scripts/ml/export-hold-ar-v2.mjs`): all angles, quality bucket, split by climb
+- v2 model (`common.py`, `train_v2.py`): Fourier hold positions + type, tied role·placement output, full-sequence training, grade/angle/quality conditions with dropout; "climb" hold order (starts, hands+feet bottom→top, finishes) beat canonical on C2ST
+- Decode: 8 candidates, T=1, no truncation, pick closest predicted grade. Likelihood rerank / top-p made climbs generic (C2ST 0.82)
+- Result (shipped int8): C2ST 0.48 (v1 0.76, real 0.46), realism 0.091 (v1 0.246), grade error 0.47 (v1 1.50); 12 MB instead of 33 MB; ~0.3 s per Generate on desktop
+- Export gotcha: nn.TransformerEncoder bakes batch size into ONNX; `export_v2.py` swaps in a plain-op encoder (checked equal) before export
+- SW: `/ai/` scripts and JSON now network-first (1.2.0 cached the worker forever); model binaries stay cache-first in `kb-ai-v2`
+- v1 model moved to `ml/hold-ar/baseline/` (eval only)
+
 ## 2026-11-20 — v1.2.0 Versions, notices, offline (ported from mob-recipes)
 
 - Version source = `package.json` → `NEXT_PUBLIC_APP_VERSION`; `next.config.ts` fails prod build if `public/sw.js` `VERSION`, `SILENT_UPDATE`/`silent`, or newest `lib/changelog.ts` entry disagree

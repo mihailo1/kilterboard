@@ -617,9 +617,9 @@ export function SetStudio() {
             {aiError}
             <span className="mt-1 block text-faint">
               Needs{' '}
-              <code className="text-muted">public/ai/boulder/hold-ar-v1.onnx</code>
+              <code className="text-muted">public/ai/boulder/hold-ar-v2.int8.onnx</code>
               {' · '}export via{' '}
-              <code className="text-muted">npm run ml:export-onnx</code>
+              <code className="text-muted">npm run ml:export-v2-onnx</code>
             </span>
           </p>
         )}

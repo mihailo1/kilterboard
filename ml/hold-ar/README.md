@@ -1,4 +1,33 @@
-# hold-ar — structured next-hold model (Plan B)
+# hold-ar — Hold AR models
+
+**Current: v2** (`common.py`, `train_v2.py`, `decode.py`, `eval_gen.py`, `export_v2.py`).
+Design and numbers: `../../AI.md`, `EVAL.md`. The sections below the line describe v1
+(`train.py`, `export_onnx.py`), kept for history; its model lives in `baseline/` for eval.
+
+## v2 quick start
+
+```bash
+python3.12 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
+cd ../.. && npm run ml:export-v2 && cd ml/hold-ar           # data/ml/v2
+./.venv/bin/python train_v2.py grade --out artifacts/grade   # rerank grade predictor
+./.venv/bin/python train_v2.py grade --out artifacts/grade-eval --d-model 256 --layers 4 --heads 8 --seed 1 --epochs 8   # eval judge
+./.venv/bin/python train_v2.py ar --order climb --epochs 6 --out artifacts/ar-climb
+./.venv/bin/python eval_gen.py --methods real,v1,v2:ar-climb --n 600
+./.venv/bin/python export_v2.py --ar ar-climb --copy-public  # int8 ONNX + meta → public/ai/boulder
+./.venv/bin/python eval_gen.py --methods v2:shipped           # re-check the shipped int8 files
+```
+
+| File | Role |
+|------|------|
+| `common.py` | data loading, hold orders, `HoldARv2`, `SetNet` (grade / discriminator), climb features |
+| `train_v2.py` | `ar` (full-sequence, conditioned) and `grade` training |
+| `decode.py` | `V1Decoder` (old worker port) and `V2Decoder` (= `public/ai/boulder/hold-ar-worker.js`) |
+| `eval_gen.py` | generation metrics vs held-out great climbs |
+| `export_v2.py` | plain-op encoder swap, ONNX export, int8, parity, meta with decode defaults |
+
+---
+
+## v1 (history) — structured next-hold model (Plan B)
 
 Train a small autoregressive policy offline; export ONNX for the browser Worker.
 

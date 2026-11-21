@@ -263,7 +263,7 @@ export function AiPlayground() {
               <span className="mt-1 block text-faint">
                 Needs{' '}
                 <code className="text-muted">
-                  public/ai/boulder/hold-ar-v1.onnx
+                  public/ai/boulder/hold-ar-v2.int8.onnx
                 </code>
               </span>
             </p>

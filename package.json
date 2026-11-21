@@ -1,7 +1,7 @@
 {
   "name": "kilterboard",
   "private": true,
-  "version": "1.2.0",
+  "version": "1.3.0",
   "scripts": {
     "predev": "node scripts/ensure-boardsesh-db.mjs",
     "dev": "next dev",
@@ -16,7 +16,10 @@
     "eval:boulder-ai": "node scripts/eval-boulder-ai.mjs",
     "apply-feedback": "node scripts/apply-feedback.mjs",
     "ml:export-sequences": "node scripts/ml/export-climb-sequences.mjs",
-    "ml:export-onnx": "cd ml/hold-ar && ./.venv/bin/python export_onnx.py --ckpt artifacts/hold-ar-v1.pt --out artifacts/hold-ar-v1.onnx --copy-public"
+    "ml:export-v2": "node scripts/ml/export-hold-ar-v2.mjs",
+    "ml:train-v2": "cd ml/hold-ar && ./.venv/bin/python train_v2.py grade --out artifacts/grade && ./.venv/bin/python train_v2.py ar --order climb --out artifacts/ar-climb",
+    "ml:eval-v2": "cd ml/hold-ar && ./.venv/bin/python eval_gen.py --methods real,v1,v2:ar-climb",
+    "ml:export-v2-onnx": "cd ml/hold-ar && ./.venv/bin/python export_v2.py --ar ar-climb --copy-public"
   },
   "dependencies": {
     "@hangtime/grip-connect": "^0.15.0",

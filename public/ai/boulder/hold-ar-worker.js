@@ -1,31 +1,48 @@
 /**
- * Hold-AR v1 — ONNX next-hold policy in a classic Web Worker.
- * Plan B4: onnxruntime-web WASM + illegal mask + polishClimb.
+ * Hold AR v2 — ONNX next-hold model in a classic Web Worker.
+ *
+ * Decoding (keep in sync with ml/hold-ar/decode.py V2Decoder):
+ *   - K candidates sampled together in one batch, conditioned on grade, angle
+ *     and quality = "great" (optional classifier-free guidance)
+ *   - hard constraints only: unused hold, ≤2 starts, ≤2 finishes, first hold
+ *     is a start, STOP once there are ≥6 holds with a start and a finish
+ *   - plain sampling (temperature / min-p / top-p kept as options, off by default)
+ *   - rerank: likWeight · mean log-probability − gradeWeight · |predicted − requested grade|,
+ *     preferring candidates whose finish sits above the start. Default likWeight 0:
+ *     picking the most likely candidate made climbs generic in the offline eval.
+ * No hand-written reach / foot rules and no polish pass: the model decides.
  *
  * Messages:
  *   { type: 'load' }
- *   { type: 'generate', grade?, seed?, temperature? }
+ *   { type: 'generate', grade?, angle?, seed?, temperature? }
  * → ready | result | error
  */
 /* global ort */
 
 importScripts('/ai/ort/ort.wasm.min.js')
 
-/** @type {import('onnxruntime-web').InferenceSession | null} */
-let session = null
-/** @type {any} */
-let index = null
-/** @type {Record<string, [number, number]>} */
-let coords = {}
-/** @type {Record<string, number>} */
-let setByPlacement = {}
-/** @type {any} */
-let rules = {}
-let ready = false
+// Overridden by hold-ar-v2.meta.json "decode" (chosen by ml/hold-ar/eval_gen.py).
+const DEFAULTS = {
+  candidates: 8,
+  temperature: 1.0,
+  topP: 1.0,
+  minP: 0,
+  guidance: 0,
+  gradeWeight: 1.0,
+  likWeight: 0,
+}
+const ROLES = [12, 13, 14, 15] // start, hand, finish, foot
+const START = 0
+const FINISH = 2
+const Q_GREAT = 3
+const Q_UNKNOWN = 4
 
-const ROLES = [12, 13, 14, 15]
-const MAX_LEN = 22
-const MIN_HOLDS = 6
+let ar = null
+let gradeNet = null
+let index = null
+let meta = null
+let coords = {}
+let ready = false
 
 function mulberry32(a) {
   return function () {
@@ -36,331 +53,205 @@ function mulberry32(a) {
   }
 }
 
-function yOf(id) {
-  return coords[String(id)]?.[1] ?? 80
+function yOfIdx(pIdx) {
+  return coords[String(index.indexToId[pIdx])]?.[1] ?? 0
 }
 
-function xOf(id) {
-  return coords[String(id)]?.[0] ?? 72
+function feeds(rows, gradeNorm, angleNorm, quality) {
+  const K = rows.length
+  const L = Math.max(1, ...rows.map((r) => r.classes.length))
+  const seq = new BigInt64Array(K * L)
+  const mask = new Uint8Array(K * L)
+  rows.forEach((r, k) => {
+    r.classes.forEach((c, i) => {
+      seq[k * L + i] = BigInt(c)
+      mask[k * L + i] = 1
+    })
+  })
+  return {
+    seq: new ort.Tensor('int64', seq, [K, L]),
+    mask: new ort.Tensor('bool', mask, [K, L]),
+    grade: new ort.Tensor('float32', new Float32Array(K).fill(gradeNorm), [K, 1]),
+    angle: new ort.Tensor('float32', new Float32Array(K).fill(angleNorm), [K, 1]),
+    quality: new ort.Tensor('int64', new BigInt64Array(K).fill(BigInt(quality)), [K]),
+  }
 }
 
-function lastHand(holds) {
-  const hands = [...holds.entries()]
-    .filter(([, r]) => r === 12 || r === 13 || r === 14)
-    .map(([id, r]) => ({ id, r, x: xOf(id), y: yOf(id) }))
-    .sort((a, b) => a.y - b.y || a.x - b.x)
-  return hands.length ? hands[hands.length - 1] : null
+async function runAr(rows, gradeNorm, angleNorm, quality) {
+  const out = await ar.run(feeds(rows, gradeNorm, angleNorm, quality))
+  return out[ar.outputNames[0]].data // Float32Array K*V
 }
 
-function polishClimb(holds) {
-  const starts = [...holds.entries()].filter(([, r]) => r === 12).map(([id]) => id)
-  const finishes = [...holds.entries()].filter(([, r]) => r === 14).map(([id]) => id)
-  if (starts.length > 2) {
-    starts
-      .sort((a, b) => yOf(a) - yOf(b))
-      .slice(2)
-      .forEach((id) => holds.set(id, 13))
-  }
-  if (finishes.length > 2) {
-    finishes
-      .sort((a, b) => yOf(b) - yOf(a))
-      .slice(2)
-      .forEach((id) => holds.set(id, 13))
-  }
+function logSoftmax(src, off, V) {
+  let max = -Infinity
+  for (let i = 0; i < V; i++) if (src[off + i] > max) max = src[off + i]
+  let sum = 0
+  for (let i = 0; i < V; i++) sum += Math.exp(src[off + i] - max)
+  const lse = max + Math.log(sum)
+  const out = new Float32Array(V)
+  for (let i = 0; i < V; i++) out[i] = src[off + i] - lse
+  return out
+}
 
-  let startIds = [...holds.entries()].filter(([, r]) => r === 12).map(([id]) => id)
-  let finishIds = [...holds.entries()].filter(([, r]) => r === 14).map(([id]) => id)
-
-  if (startIds.length === 0 && holds.size) {
-    const lowest = [...holds.keys()].sort((a, b) => yOf(a) - yOf(b))[0]
-    holds.set(lowest, 12)
-    startIds = [lowest]
+function allowed(row, n) {
+  const V = n * 4 + 1
+  const allow = new Uint8Array(V)
+  const len = row.classes.length
+  if (len >= meta.maxLen) {
+    allow[V - 1] = 1
+    return allow
   }
-  if (finishIds.length === 0 && holds.size) {
-    const highest = [...holds.keys()].sort((a, b) => yOf(b) - yOf(a))[0]
-    if (!startIds.includes(highest)) {
-      holds.set(highest, 14)
-      finishIds = [highest]
+  for (let p = 0; p < n; p++) {
+    if (row.used.has(p)) continue
+    for (let r = 0; r < 4; r++) {
+      if (len === 0 && r !== START) continue
+      if (r === START && row.nStart >= 2) continue
+      if (r === FINISH && row.nFinish >= 2) continue
+      allow[p * 4 + r] = 1
     }
   }
-
-  startIds = [...holds.entries()].filter(([, r]) => r === 12).map(([id]) => id)
-  finishIds = [...holds.entries()].filter(([, r]) => r === 14).map(([id]) => id)
-
-  const mean = (ids) =>
-    ids.length ? ids.reduce((s, id) => s + yOf(id), 0) / ids.length : 0
-  let sY = mean(startIds)
-  let fY = mean(finishIds)
-
-  const needReseat =
-    (finishIds.length && startIds.length && fY < sY + 24) ||
-    (finishIds.length && fY < 120) ||
-    (startIds.length && sY > 90)
-  if (needReseat && holds.size >= 3) {
-    const all = [...holds.keys()].sort((a, b) => yOf(a) - yOf(b))
-    for (const id of startIds) holds.set(id, 13)
-    for (const id of finishIds) holds.set(id, 13)
-    const nS = Math.min(2, Math.max(1, startIds.length || 1))
-    const nF = Math.min(2, Math.max(1, finishIds.length || 1))
-    for (let i = 0; i < nS; i++) holds.set(all[i], 12)
-    for (let i = 0; i < nF; i++) holds.set(all[all.length - 1 - i], 14)
-  }
-
-  startIds = [...holds.entries()].filter(([, r]) => r === 12).map(([id]) => id)
-  finishIds = [...holds.entries()].filter(([, r]) => r === 14).map(([id]) => id)
-  if (startIds.length > 2) {
-    startIds
-      .sort((a, b) => yOf(a) - yOf(b))
-      .slice(2)
-      .forEach((id) => holds.set(id, 13))
-  }
-  if (finishIds.length > 2) {
-    finishIds
-      .sort((a, b) => yOf(b) - yOf(a))
-      .slice(2)
-      .forEach((id) => holds.set(id, 13))
-  }
-  return holds
-}
-
-function classToHold(cls, nPlacements) {
-  if (cls < 0 || cls >= nPlacements * 4) return null
-  const pIdx = Math.floor(cls / 4)
-  const rIdx = cls % 4
-  const placementId = index.indexToId[pIdx]
-  const role = ROLES[rIdx]
-  if (placementId == null || role == null) return null
-  return { placementId, role, pIdx, rIdx }
-}
-
-/**
- * Build illegal mask over vocab (true = allowed).
- * @param {Map<number, number>} holds
- * @param {number} step
- */
-function allowedMask(holds, step) {
-  const n = index.nPlacements
-  const stop = index.stopClass
-  const vocab = index.vocabSize
-  const allow = new Float32Array(vocab)
-  // default all off
-  let nStart = 0
-  let nFinish = 0
-  for (const r of holds.values()) {
-    if (r === 12) nStart++
-    if (r === 14) nFinish++
-  }
-  const used = new Set(holds.keys())
-  const prev = lastHand(holds)
-  const reachMax = rules?.handReach?.max ?? 55
-  const footDyMin = rules?.footBelow?.dyMin ?? 6
-  const footDyMax = rules?.footBelow?.dyMax ?? 48
-  const footDxMax = rules?.footBelow?.dxAbsP90 ?? 28
-
-  for (let pIdx = 0; pIdx < n; pIdx++) {
-    const pid = index.indexToId[pIdx]
-    if (pid == null || used.has(pid)) continue
-    if (!coords[String(pid)]) continue
-    const px = xOf(pid)
-    const py = yOf(pid)
-    for (let rIdx = 0; rIdx < 4; rIdx++) {
-      const role = ROLES[rIdx]
-      if (role === 12 && nStart >= 2) continue
-      if (role === 14 && nFinish >= 2) continue
-      // early steps: only starts until we have ≥1
-      if (nStart === 0 && role !== 12 && step < 3) continue
-      // don't finish before volume
-      if (role === 14 && holds.size < 4) continue
-      // reach cut for hand/finish vs previous hand sequence point
-      if ((role === 13 || role === 14) && prev) {
-        const d = Math.hypot(px - prev.x, py - prev.y)
-        if (d > reachMax * 1.15) continue
-      }
-      // feet should sit roughly under a hand zone
-      if (role === 15) {
-        let okFoot = false
-        for (const [hid, hr] of holds) {
-          if (hr !== 12 && hr !== 13 && hr !== 14) continue
-          const fdy = yOf(hid) - py
-          const fdx = Math.abs(xOf(hid) - px)
-          if (fdy >= footDyMin * 0.5 && fdy <= footDyMax * 1.2 && fdx <= footDxMax * 1.4) {
-            okFoot = true
-            break
-          }
-        }
-        // allow early feet without hands only rarely — require a hand if any exist
-        if (prev && !okFoot) continue
-      }
-      allow[pIdx * 4 + rIdx] = 1
-    }
-  }
-  // STOP only after min holds
-  if (holds.size >= MIN_HOLDS) allow[stop] = 1
-  // force STOP if full
-  if (holds.size >= MAX_LEN) {
-    allow.fill(0)
-    allow[stop] = 1
-  }
+  if (len >= 6 && row.nStart >= 1 && row.nFinish >= 1) allow[V - 1] = 1
   return allow
 }
 
-function sampleLogits(logits, allow, temperature, rand) {
-  const T = Math.max(0.05, temperature)
-  let maxL = -Infinity
-  for (let i = 0; i < logits.length; i++) {
-    if (!allow[i]) continue
-    if (logits[i] > maxL) maxL = logits[i]
-  }
-  if (maxL === -Infinity) {
-    // fallback: any start
-    for (let i = 0; i < allow.length; i++) {
-      if (allow[i]) return i
-    }
-    return index.stopClass
-  }
+/** temperature → min-p → top-p, then draw. Returns a class id. */
+function sample(logits, allow, opts, rand) {
+  const V = logits.length
+  const T = Math.max(0.05, opts.temperature)
+  let max = -Infinity
+  for (let i = 0; i < V; i++) if (allow[i] && logits[i] > max) max = logits[i]
+  if (max === -Infinity) return V - 1
+  const items = []
   let sum = 0
-  const weights = new Float32Array(logits.length)
-  for (let i = 0; i < logits.length; i++) {
-    if (!allow[i]) {
-      weights[i] = 0
-      continue
-    }
-    let w = Math.exp((logits[i] - maxL) / T)
-    // downweight screw-on feet
-    const hold = classToHold(i, index.nPlacements)
-    if (hold && hold.role === 15) {
-      const setId =
-        setByPlacement[String(hold.placementId)] ??
-        index.setByPlacement?.[String(hold.placementId)]
-      if (setId === 20) w *= 0.15
-    }
-    weights[i] = w
+  for (let i = 0; i < V; i++) {
+    if (!allow[i]) continue
+    const w = Math.exp((logits[i] - max) / T)
+    items.push([i, w])
     sum += w
   }
-  if (sum <= 0) return index.stopClass
-  let r = rand() * sum
-  for (let i = 0; i < weights.length; i++) {
-    r -= weights[i]
+  const pMax = 1 / sum // the top item has weight 1
+  let kept = items.filter(([, w]) => w / sum >= opts.minP * pMax)
+  kept.sort((a, b) => b[1] - a[1])
+  const keptSum = kept.reduce((s, [, w]) => s + w, 0)
+  let cum = 0
+  const nucleus = []
+  for (const it of kept) {
+    if (cum >= opts.topP * keptSum) break
+    nucleus.push(it)
+    cum += it[1]
+  }
+  kept = nucleus.length ? nucleus : kept.slice(0, 1)
+  let r = rand() * kept.reduce((s, [, w]) => s + w, 0)
+  for (const [i, w] of kept) {
+    r -= w
     if (r <= 0) return i
   }
-  return index.stopClass
+  return kept[kept.length - 1][0]
 }
 
-async function runStep(classes, gradeNorm) {
-  const maxLen = index.maxLen || MAX_LEN
-  const seq = new BigInt64Array(maxLen)
-  const mask = new Uint8Array(maxLen)
-  for (let i = 0; i < maxLen; i++) {
-    if (i < classes.length) {
-      seq[i] = BigInt(classes[i])
-      mask[i] = 1
-    } else {
-      seq[i] = 0n
-      mask[i] = 0
-    }
-  }
-  const grade = new Float32Array([gradeNorm])
-
-  // onnxruntime-web Tensor API
-  const feeds = {
-    seq: new ort.Tensor('int64', seq, [1, maxLen]),
-    mask: new ort.Tensor('bool', mask, [1, maxLen]),
-    grade: new ort.Tensor('float32', grade, [1, 1]),
-  }
-  const out = await session.run(feeds)
-  const logitsTensor = out.logits || out[Object.keys(out)[0]]
-  return logitsTensor.data // Float32Array length vocab
+async function predictGrades(rows, angleNorm) {
+  if (!gradeNet) return null
+  const f = feeds(rows, 0, angleNorm, 0)
+  const out = await gradeNet.run({ seq: f.seq, mask: f.mask, angle: f.angle })
+  return out[gradeNet.outputNames[0]].data
 }
 
-async function genHoldAr(grade, seed, temperature) {
+function structureOk(row) {
+  const roles = row.classes.map((c) => c % 4)
+  const s = row.classes.filter((c) => c % 4 === START).map((c) => yOfIdx(Math.floor(c / 4)))
+  const f = row.classes.filter((c) => c % 4 === FINISH).map((c) => yOfIdx(Math.floor(c / 4)))
+  if (roles.length < 6 || !s.length || !f.length || s.length > 2 || f.length > 2) return false
+  const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length
+  return mean(f) - mean(s) > 20
+}
+
+async function generate({ grade, angle, seed, temperature }) {
+  const opts = { ...DEFAULTS, ...(meta.decode || {}) }
+  if (typeof temperature === 'number') opts.temperature = temperature
   const rand = mulberry32(seed >>> 0)
-  const g =
-    grade != null && Number.isFinite(grade) ? Number(grade) : 16
-  const gradeNorm = (Math.min(33, Math.max(10, g)) - 10) / 23
+  const g = Math.min(33, Math.max(10, Number.isFinite(grade) ? grade : 16))
+  const gradeNorm = (g - 10) / 23
+  const angleNorm = (Number.isFinite(angle) ? angle : 40) / 70
+  const n = meta.nPlacements
+  const V = n * 4 + 1
+  const rows = Array.from({ length: opts.candidates }, () => ({
+    classes: [],
+    used: new Set(),
+    nStart: 0,
+    nFinish: 0,
+    logp: 0,
+    done: false,
+  }))
 
-  /** @type {number[]} */
-  const classes = []
-  /** @type {Map<number, number>} */
-  const holds = new Map()
-
-  for (let step = 0; step < MAX_LEN; step++) {
-    const logits = await runStep(classes, gradeNorm)
-    const allow = allowedMask(holds, step)
-    // ensure at least one allowed
-    let any = false
-    for (let i = 0; i < allow.length; i++) {
-      if (allow[i]) {
-        any = true
-        break
+  for (let step = 0; step <= meta.maxLen; step++) {
+    const live = rows.filter((r) => !r.done)
+    if (!live.length) break
+    const logits = await runAr(live, gradeNorm, angleNorm, Q_GREAT)
+    const uncond = opts.guidance ? await runAr(live, gradeNorm, angleNorm, Q_UNKNOWN) : null
+    live.forEach((row, k) => {
+      const lp = logSoftmax(logits, k * V, V)
+      const mixed = new Float32Array(V)
+      for (let i = 0; i < V; i++) {
+        const l = logits[k * V + i]
+        mixed[i] = uncond ? l + opts.guidance * (l - uncond[k * V + i]) : l
       }
+      const c = sample(mixed, allowed(row, n), opts, rand)
+      row.logp += lp[c]
+      if (c === V - 1) {
+        row.done = true
+        return
+      }
+      const p = Math.floor(c / 4)
+      const r = c % 4
+      row.classes.push(c)
+      row.used.add(p)
+      if (r === START) row.nStart++
+      if (r === FINISH) row.nFinish++
+    })
+  }
+
+  const grades = await predictGrades(rows, angleNorm)
+  let best = null
+  let bestScore = -Infinity
+  const anyOk = rows.some(structureOk)
+  rows.forEach((row, k) => {
+    if (anyOk && !structureOk(row)) return
+    let score = opts.likWeight * (row.logp / (row.classes.length + 1))
+    if (grades) score -= opts.gradeWeight * Math.abs(grades[k] - g)
+    if (score > bestScore) {
+      bestScore = score
+      best = { row, predicted: grades ? grades[k] : null }
     }
-    if (!any) break
-
-    const cls = sampleLogits(logits, allow, temperature, rand)
-    if (cls === index.stopClass) break
-
-    const hold = classToHold(cls, index.nPlacements)
-    if (!hold) break
-    if (holds.has(hold.placementId)) continue
-    holds.set(hold.placementId, hold.role)
-    classes.push(cls)
-  }
-
-  // if too sparse, keep sampling without STOP
-  let guard = 0
-  while (holds.size < MIN_HOLDS && guard++ < 12) {
-    const logits = await runStep(classes, gradeNorm)
-    const allow = allowedMask(holds, classes.length)
-    allow[index.stopClass] = 0
-    const cls = sampleLogits(logits, allow, Math.max(temperature, 0.9), rand)
-    if (cls === index.stopClass) break
-    const hold = classToHold(cls, index.nPlacements)
-    if (!hold || holds.has(hold.placementId)) break
-    holds.set(hold.placementId, hold.role)
-    classes.push(cls)
-  }
-
-  polishClimb(holds)
-  return holds
+  })
+  const holds = new Map(
+    best.row.classes.map((c) => [index.indexToId[Math.floor(c / 4)], ROLES[c % 4]]),
+  )
+  return { holds, predictedGrade: best.predicted }
 }
 
 async function loadAll() {
-  if (typeof ort === 'undefined') {
-    throw new Error('onnxruntime-web failed to load (importScripts)')
-  }
-  // Single-thread WASM is more reliable in dedicated workers
+  if (typeof ort === 'undefined') throw new Error('onnxruntime-web failed to load (importScripts)')
   ort.env.wasm.numThreads = 1
   ort.env.wasm.simd = true
   ort.env.wasm.wasmPaths = '/ai/ort/'
 
   const [indexRes, metaRes, modelsRes] = await Promise.all([
     fetch('/ai/boulder/placement_index.json'),
-    fetch('/ai/boulder/hold-ar-v1.meta.json'),
+    fetch('/ai/boulder/hold-ar-v2.meta.json'),
     fetch('/ai/boulder/models.json'),
   ])
-  if (!indexRes.ok) throw new Error('Failed to load placement_index.json')
-  if (!modelsRes.ok) throw new Error('Failed to load models.json (coords)')
+  if (!indexRes.ok || !metaRes.ok || !modelsRes.ok) throw new Error('Failed to load Hold AR files')
   index = await indexRes.json()
-  if (metaRes.ok) {
-    const meta = await metaRes.json()
-    index.maxLen = meta.maxLen || MAX_LEN
-    index.vocabSize = meta.vocab || index.vocabSize
-    index.stopClass = meta.stopClass ?? index.stopClass
-  }
-  if (!index.setByPlacement) index.setByPlacement = {}
-  setByPlacement = index.setByPlacement
+  meta = await metaRes.json()
+  coords = (await modelsRes.json()).coords || {}
 
-  const pack = await modelsRes.json()
-  coords = pack.coords || {}
-  if (pack.setByPlacement) {
-    setByPlacement = pack.setByPlacement
-    index.setByPlacement = pack.setByPlacement
+  const opt = { executionProviders: ['wasm'], graphOptimizationLevel: 'all' }
+  ar = await ort.InferenceSession.create(`/ai/boulder/${meta.onnx}`, opt)
+  try {
+    gradeNet = await ort.InferenceSession.create(`/ai/boulder/${meta.gradeOnnx}`, opt)
+  } catch {
+    gradeNet = null // rerank by likelihood only
   }
-  rules = pack.models?.remix?.rules || pack.rules || {}
-
-  session = await ort.InferenceSession.create('/ai/boulder/hold-ar-v1.onnx', {
-    executionProviders: ['wasm'],
-  })
   ready = true
 }
 
@@ -374,46 +265,36 @@ self.onmessage = async (ev) => {
         models: [
           {
             id: 'hold-ar',
-            name: 'Hold AR (local NN)',
-            description:
-              'Autoregressive next-hold ONNX policy · polishClimb after decode',
+            name: 'Hold AR v2 (local NN)',
+            description: 'Quality-conditioned next-hold transformer · best of several candidates',
           },
         ],
-        climbCount: undefined,
-        builtAt: index?.createdAt,
-        backend: 'hold-ar-onnx',
+        builtAt: meta?.createdAt,
+        backend: 'hold-ar-v2-onnx',
       })
       return
     }
-
     if (msg.type === 'generate') {
-      if (!ready || !session) throw new Error('Hold-AR not loaded')
-      const seed =
-        typeof msg.seed === 'number' ? msg.seed : (Math.random() * 1e9) | 0
-      const grade = msg.grade
-      const temperature =
-        typeof msg.temperature === 'number' ? msg.temperature : 0.85
-      const holds = await genHoldAr(grade, seed, temperature)
-      const list = [...holds.entries()].map(([id, role]) => [id, role])
+      if (!ready) throw new Error('Hold AR not loaded')
+      const seed = typeof msg.seed === 'number' ? msg.seed : (Math.random() * 1e9) | 0
+      const { holds, predictedGrade } = await generate({ ...msg, seed })
+      const values = [...holds.values()]
       self.postMessage({
         type: 'result',
         model: 'hold-ar',
         seed,
-        holds: list,
+        holds: [...holds.entries()],
         meta: {
           holdCount: holds.size,
-          starts: [...holds.values()].filter((r) => r === 12).length,
-          finishes: [...holds.values()].filter((r) => r === 14).length,
+          starts: values.filter((r) => r === 12).length,
+          finishes: values.filter((r) => r === 14).length,
+          predictedGrade,
         },
       })
       return
     }
-
     self.postMessage({ type: 'error', error: `Unknown message: ${msg.type}` })
   } catch (e) {
-    self.postMessage({
-      type: 'error',
-      error: e instanceof Error ? e.message : String(e),
-    })
+    self.postMessage({ type: 'error', error: e instanceof Error ? e.message : String(e) })
   }
 }

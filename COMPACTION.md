@@ -27,9 +27,9 @@ Product
 - Unofficial, not affiliated with Aurora/Kilter/Boardsesh
 
 AI
-- Hold AR only: public/ai/boulder/hold-ar-worker.js + hold-ar-v1.onnx (~33MB)
+- Hold AR v2 only: public/ai/boulder/hold-ar-worker.js + hold-ar-v2.int8.onnx (~10MB) + grade-v2.int8.onnx
 - playground has BLE Connect; no remix / Approve-tags UI
-- Train: ml/hold-ar · npm run ml:export-onnx
+- Train: ml/hold-ar · npm run ml:export-v2 → ml:train-v2 → ml:eval-v2 → ml:export-v2-onnx
 
 Catalog / auto-update
 - DB gitignored: data/boardsesh/kilter-12x12.db (+ .gz ~37MB slim)

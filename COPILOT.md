@@ -36,9 +36,10 @@ npm run sync:climbs          # Boardsesh DB (stale-aware)
 npm run sync:climbs:force    # always rebuild slim DB
 npm run ensure:climbs        # same as predev / build gate
 npm run train:boulder-ai     # rebuild models.json (coords/rules pack)
-npm run ml:export-sequences  # Plan B dataset for train
-# Python: ml/hold-ar train + export_onnx
-npm run ml:export-onnx       # → public/ai/boulder/hold-ar-v1.onnx
+npm run ml:export-v2         # Hold AR v2 dataset → data/ml/v2
+npm run ml:train-v2          # Python (ml/hold-ar/.venv): grade predictor + AR model
+npm run ml:eval-v2           # generation metrics vs real climbs (see ml/hold-ar/EVAL.md)
+npm run ml:export-v2-onnx    # → public/ai/boulder/hold-ar-v2.int8.onnx + grade-v2 + meta
 npm run dev                  # http://localhost:3000
 npm run build
 ```
@@ -52,7 +53,7 @@ npm run build
 5. **Mobile boards:** wrap board surfaces in `MobileBoardScroller` (phone only); Set gesture mode uses `disablePan`
 6. **Filter scroll (Climbs only):** manual close sets `filtersPinnedClosed` so near-top scroll doesn’t flash filters open. **Hold search:** no scroll auto-collapse
 4. BLE: Chrome/Edge or Android Chrome natively; **iOS Safari via iOSWebBLE extension** (injects `navigator.bluetooth`; detection + install hints in `lib/aurora/ble-env.ts` / `BluetoothSet`). No BLE in iOS Home Screen app or non-Safari iOS browsers
-5. AI: **Hold AR only** (local ONNX). No remix in product UI.
+5. AI: **Hold AR v2 only** (local int8 ONNX, best-of-8 by grade). Decoding lives in both `ml/hold-ar/decode.py` and `hold-ar-worker.js` — change both and re-run `ml:eval-v2`. No remix in product UI.
 6. Playground: gen + paint; no feedback labels UI
 
 ## Layout map
@@ -70,7 +71,7 @@ lib/
   boardsesh.ts · grades.ts · set-rules.ts · set-drafts.ts
   # openClimbInSetDraft → "{name} (modified)" local draft
 public/ai/
-  boulder/hold-ar-worker.js · hold-ar-v1.onnx · placement_index.json · models.json
+  boulder/hold-ar-worker.js · hold-ar-v2.int8.onnx · grade-v2.int8.onnx · hold-ar-v2.meta.json · placement_index.json · models.json
   ort/   # onnxruntime-web wasm
 ml/hold-ar/   # Python train + export
 scripts/      # sync, train-boulder-ai, eval, ml export

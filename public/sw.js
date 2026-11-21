@@ -15,7 +15,7 @@
  * friends are network-first and fall back to the last answer for the same
  * query (marked with the x-kb-cached header so the UI can say so).
  */
-const VERSION = "1.2.0";
+const VERSION = "1.3.0";
 // true: this release takes over on its own and reloads open pages, with no
 // "Update" banner. Must equal `silent` on the newest entry in lib/changelog.ts
 // (next.config.ts fails the build otherwise). Set back to false afterwards.
@@ -29,8 +29,11 @@ const CACHES = {
   data: `${PREFIX}data-${VERSION}-r${REV}`,
   static: `${PREFIX}static-v1`,
   assets: `${PREFIX}assets-v1`,
-  // Hold AR model + onnxruntime wasm (~45MB): kept once downloaded.
-  ai: `${PREFIX}ai-v1`,
+  // Hold AR model files + onnxruntime wasm: kept once downloaded. Their names
+  // carry a version (hold-ar-v2.int8.onnx), so cache-first is safe for them.
+  // v1 → v2 also drops the old 33MB v1 model from phones. Bump this name when
+  // public/ai/ort/ is upgraded (same file names, new contents).
+  ai: `${PREFIX}ai-v2`,
   offline: `${PREFIX}offline-v1`,
 };
 const LIMITS = {
@@ -127,7 +130,10 @@ self.addEventListener("fetch", (event) => {
     return;
   }
   if (path.startsWith("/ai/")) {
-    event.respondWith(cacheFirst(event, CACHES.ai));
+    // Big binaries never change under the same name; the worker script and
+    // its JSON (index, meta) do, so those are network-first.
+    const immutable = path.endsWith(".onnx") || path.endsWith(".wasm") || path.startsWith("/ai/ort/");
+    event.respondWith(immutable ? cacheFirst(event, CACHES.ai) : networkFirstAsset(event, CACHES.ai));
     return;
   }
   if (
@@ -208,6 +214,19 @@ function withTimeout(promise, ms) {
     promise,
     new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
   ]);
+}
+
+async function networkFirstAsset(event, cacheName) {
+  const { request } = event;
+  try {
+    const res = await withTimeout(fetch(request), API_TIMEOUT_MS);
+    if (isCacheable(res)) event.waitUntil(put(cacheName, request, res.clone()));
+    return res;
+  } catch {
+    const hit = await (await caches.open(cacheName)).match(request);
+    if (hit) return hit;
+    throw new Error("offline");
+  }
 }
 
 /** Copy of a cached API answer, marked so the page knows it may be old. */
